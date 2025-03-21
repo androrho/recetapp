@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "731614538303",
+    "project_id": "recetapp-9c1bf",
+    "storage_bucket": "recetapp-9c1bf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731614538303:android:a790e80c9eebf3aa74268a",
+        "android_client_info": {
+          "package_name": "com.aob.recetapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAz_HxrhiFCzHchyydCGTj0L7B9YTZcY_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
