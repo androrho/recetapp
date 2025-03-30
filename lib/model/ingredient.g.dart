@@ -7,6 +7,7 @@ part of 'ingredient.dart';
 // **************************************************************************
 
 Ingredient _$IngredientFromJson(Map<String, dynamic> json) => Ingredient(
+  id: json['id'] as String?,
   name: json['name'] as String,
   quantity: (json['quantity'] as num).toDouble(),
   quantityType: json['quantityType'] as String,
@@ -15,6 +16,7 @@ Ingredient _$IngredientFromJson(Map<String, dynamic> json) => Ingredient(
 
 Map<String, dynamic> _$IngredientToJson(Ingredient instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'quantity': instance.quantity,
       'quantityType': instance.quantityType,

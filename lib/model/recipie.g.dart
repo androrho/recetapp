@@ -7,6 +7,7 @@ part of 'recipie.dart';
 // **************************************************************************
 
 Recipie _$RecipieFromJson(Map<String, dynamic> json) => Recipie(
+  id: json['id'] as String?,
   description: json['description'] as String,
   personNumber: (json['personNumber'] as num).toInt(),
   title: json['title'] as String,
@@ -14,6 +15,7 @@ Recipie _$RecipieFromJson(Map<String, dynamic> json) => Recipie(
 );
 
 Map<String, dynamic> _$RecipieToJson(Recipie instance) => <String, dynamic>{
+  'id': instance.id,
   'description': instance.description,
   'personNumber': instance.personNumber,
   'title': instance.title,

@@ -7,12 +7,14 @@ part of 'photo.dart';
 // **************************************************************************
 
 Photo _$PhotoFromJson(Map<String, dynamic> json) => Photo(
+  id: json['id'] as String?,
   path: json['path'] as String,
   position: (json['position'] as num).toInt(),
   recipie: Recipie.fromJson(json['recipie'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PhotoToJson(Photo instance) => <String, dynamic>{
+  'id': instance.id,
   'path': instance.path,
   'position': instance.position,
   'recipie': instance.recipie,
