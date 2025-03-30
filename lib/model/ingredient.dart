@@ -37,7 +37,11 @@ class Ingredient {
 
   factory Ingredient.fromJson(Map<String, dynamic> json) => _$IngredientFromJson(json);
 
-  Map<String, dynamic> toJson() => _$IngredientToJson(this);
+  Map<String, dynamic> toJson() {
+    final json = _$IngredientToJson(this);
+    json['recipie'] = recipie.id;
+    return json;
+  }
 
   @override
   String toString() {

@@ -37,7 +37,11 @@ class Recipie {
 
   factory Recipie.fromJson(Map<String, dynamic> json) => _$RecipieFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RecipieToJson(this);
+  Map<String, dynamic> toJson() {
+    final json = _$RecipieToJson(this);
+    json['user'] = user.id;
+    return json;
+  }
 
   @override
   String toString() {

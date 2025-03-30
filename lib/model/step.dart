@@ -34,7 +34,11 @@ class Step {
 
   factory Step.fromJson(Map<String, dynamic> json) => _$StepFromJson(json);
 
-  Map<String, dynamic> toJson() => _$StepToJson(this);
+  Map<String, dynamic> toJson() {
+    final json = _$StepToJson(this);
+    json['recipie'] = recipie.id;
+    return json;
+  }
 
   @override
   String toString() {
