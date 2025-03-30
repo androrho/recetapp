@@ -6,10 +6,10 @@ part 'recipie.g.dart';
 @JsonSerializable()
 class Recipie {
   final String? id;
-  final String description;
-  final int personNumber;
-  final String title;
-  final User user;
+  String description;
+  int personNumber;
+  String title;
+  User user;
 
   Recipie({
     this.id,
@@ -18,6 +18,22 @@ class Recipie {
     required this.title,
     required this.user,
   });
+
+  Recipie copyWith({
+    String? id,
+    String? description,
+    int? personNumber,
+    String? title,
+    User? user,
+  }) {
+    return Recipie(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      personNumber: personNumber ?? this.personNumber,
+      title: title ?? this.title,
+      user: user ?? this.user,
+    );
+  }
 
   factory Recipie.fromJson(Map<String, dynamic> json) => _$RecipieFromJson(json);
 

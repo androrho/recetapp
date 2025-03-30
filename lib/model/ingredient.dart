@@ -6,10 +6,10 @@ part 'ingredient.g.dart';
 @JsonSerializable()
 class Ingredient {
   final String? id;
-  final String name;
-  final double quantity;
-  final String quantityType;
-  final Recipie recipie;
+  String name;
+  double quantity;
+  String quantityType;
+  Recipie recipie;
 
   Ingredient({
     this.id,
@@ -18,6 +18,22 @@ class Ingredient {
     required this.quantityType,
     required this.recipie,
   });
+
+  Ingredient copyWith({
+    String? id,
+    String? name,
+    double? quantity,
+    String? quantityType,
+    Recipie? recipie,
+  }) {
+    return Ingredient(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      quantity: quantity ?? this.quantity,
+      quantityType: quantityType ?? this.quantityType,
+      recipie: recipie ?? this.recipie,
+    );
+  }
 
   factory Ingredient.fromJson(Map<String, dynamic> json) => _$IngredientFromJson(json);
 

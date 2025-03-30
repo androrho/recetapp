@@ -6,9 +6,9 @@ part 'photo.g.dart';
 @JsonSerializable()
 class Photo {
   final String? id;
-  final String path;
-  final int position;
-  final Recipie recipie;
+  String path;
+  int position;
+  Recipie recipie;
 
   Photo({
     this.id,
@@ -16,6 +16,20 @@ class Photo {
     required this.position,
     required this.recipie,
   });
+
+  Photo copyWith({
+    String? id,
+    String? path,
+    int? position,
+    Recipie? recipie,
+  }) {
+    return Photo(
+      id: id ?? this.id,
+      path: path ?? this.path,
+      position: position ?? this.position,
+      recipie: recipie ?? this.recipie,
+    );
+  }
 
   factory Photo.fromJson(Map<String, dynamic> json) => _$PhotoFromJson(json);
 
