@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:recetapp/model/user.dart';
+
+import '../../controller/recipies_service.dart';
+import '../../model/recipie.dart';
 
 class AddRecipieScreen extends StatelessWidget {
   const AddRecipieScreen({super.key});
@@ -14,6 +16,11 @@ class AddRecipieScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         tooltip: 'Añadir',
         onPressed: () {
+          User u = User(displayName: "Administrator", login: "admin", password: "admin1234");
+          Recipie r = Recipie(description: 'm', personNumber: 2, title: "macarrones", user: u);
+          print(r.toJson());
+          RecipiesService rs = RecipiesService();
+          rs.create(r);
         },
         child: const Icon(Icons.add),
       ),
