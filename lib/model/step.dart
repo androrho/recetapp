@@ -38,6 +38,6 @@ class Step {
 
   @override
   String toString() {
-    return 'Step{text: $text}';
+    return 'steps/$text';
   }
 }

@@ -37,6 +37,6 @@ class Photo {
 
   @override
   String toString() {
-    return 'Photo{path: $path}';
+    return 'photos/$path';
   }
 }

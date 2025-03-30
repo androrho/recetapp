@@ -41,6 +41,6 @@ class Ingredient {
 
   @override
   String toString() {
-    return 'Ingredient{name: $name}';
+    return 'ingredients/$id';
   }
 }

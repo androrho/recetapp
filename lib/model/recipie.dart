@@ -41,6 +41,6 @@ class Recipie {
 
   @override
   String toString() {
-    return 'Recipie{login: $title}';
+    return 'recipies/$id';
   }
 }

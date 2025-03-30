@@ -36,6 +36,6 @@ class User {
 
   @override
   String toString() {
-    return 'User{login: $login}';
+    return 'users/$id';
   }
 }
