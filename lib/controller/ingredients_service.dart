@@ -6,8 +6,10 @@ class IngredientsService {
   final String _collection = 'ingredients';
 
   Future<void> create(Ingredient object) async {
-    // Utilizamos el método toJson que internamente llama a _$UserToJson
-    await _db.collection(_collection).add(object.toJson());
+    final collection = FirebaseFirestore.instance.collection(_collection);
+    final docRef = collection.doc();
+    final newObject = object.copyWith(id: docRef.id);
+    await docRef.set(newObject.toJson());
   }
 
   Stream<List<Ingredient>> read() {

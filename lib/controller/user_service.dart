@@ -6,17 +6,17 @@ class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String _collection = 'users';
 
-  Future<void> create(User user) async {
+  Future<void> create(User object) async {
     final collection = FirebaseFirestore.instance.collection(_collection);
-    // Utilizamos el método toJson que internamente llama a _$UserToJson
-    await _db.collection(_collection).add(user.toJson());
+    final docRef = collection.doc();
+    final newObject = object.copyWith(id: docRef.id);
+    await docRef.set(newObject.toJson());
   }
 
   Stream<List<User>> read() {
     return _db.collection(_collection).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data();
-        // Si necesitas guardar el ID del documento en tu modelo, lo asignas aquí
         data['id'] = doc.id;
         return User.fromJson(data);
       }).toList();

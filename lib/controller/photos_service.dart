@@ -7,8 +7,10 @@ class PhotosService {
   final String _collection = 'photos';
 
   Future<void> create(Photo object) async {
-    // Utilizamos el método toJson que internamente llama a _$UserToJson
-    await _db.collection(_collection).add(object.toJson());
+    final collection = FirebaseFirestore.instance.collection(_collection);
+    final docRef = collection.doc();
+    final newObject = object.copyWith(id: docRef.id);
+    await docRef.set(newObject.toJson());
   }
 
   Stream<List<Photo>> read() {
