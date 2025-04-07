@@ -13,15 +13,13 @@ class RecipiesService {
     await docRef.set(newObject.toJson());
   }
 
-  Stream<List<Recipie>> read() {
-    return _db.collection(_collection).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        // Si necesitas guardar el ID del documento en tu modelo, lo asignas aquí
-        data['id'] = doc.id;
-        return Recipie.fromJson(data);
-      }).toList();
-    });
+  Future<List<Recipie>> read() async {
+    final snapshot = await _db.collection(_collection).get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Recipie.fromJson(data);
+    }).toList();
   }
 
   Future<Recipie?> readById(String id) async {
