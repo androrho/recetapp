@@ -8,10 +8,10 @@ part of 'recipie.dart';
 
 Recipie _$RecipieFromJson(Map<String, dynamic> json) => Recipie(
   id: json['id'] as String?,
-  description: json['description'] as String,
-  personNumber: (json['personNumber'] as num).toInt(),
-  title: json['title'] as String,
-  user: User.fromJson(json['user'] as Map<String, dynamic>),
+  description: json['description'] as String?,
+  personNumber: (json['personNumber'] as num?)?.toInt(),
+  title: json['title'] as String?,
+  user: json['user'] as String?,
 );
 
 Map<String, dynamic> _$RecipieToJson(Recipie instance) => <String, dynamic>{

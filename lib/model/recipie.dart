@@ -1,22 +1,21 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:recetapp/model/user.dart';
 
 part 'recipie.g.dart';
 
 @JsonSerializable()
 class Recipie {
   final String? id;
-  String description;
-  int personNumber;
-  String title;
-  User user;
+  String? description;
+  int? personNumber;
+  String? title;
+  String? user;
 
   Recipie({
     this.id,
-    required this.description,
-    required this.personNumber,
-    required this.title,
-    required this.user,
+    this.description,
+    this.personNumber,
+    this.title,
+    this.user,
   });
 
   Recipie copyWith({
@@ -24,7 +23,7 @@ class Recipie {
     String? description,
     int? personNumber,
     String? title,
-    User? user,
+    String? user,
   }) {
     return Recipie(
       id: id ?? this.id,
@@ -39,7 +38,6 @@ class Recipie {
 
   Map<String, dynamic> toJson() {
     final json = _$RecipieToJson(this);
-    json['user'] = user.id;
     return json;
   }
 
