@@ -22,14 +22,14 @@ class RecipiesService {
     }).toList();
   }
 
-  Future<Recipie?> readById(String id) async {
+  Future<Recipie> readById(String id) async {
     final doc = await _db.collection(_collection).doc(id).get();
     if (doc.exists) {
       final data = doc.data()!;
       data['id'] = doc.id;
       return Recipie.fromJson(data);
     }
-    return null;
+    return new Recipie(id: "0", description: "n/a", personNumber: 0, title: "n/a", user: "0");
   }
 
   Future<void> update(String id, Recipie object) async {
