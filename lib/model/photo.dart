@@ -1,14 +1,13 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:recetapp/model/recipie.dart';
 
 part 'photo.g.dart';
 
 @JsonSerializable()
 class Photo {
   final String? id;
-  String path;
-  int position;
-  Recipie recipie;
+  String? path;
+  int? position;
+  String? recipie;
 
   Photo({
     this.id,
@@ -21,7 +20,7 @@ class Photo {
     String? id,
     String? path,
     int? position,
-    Recipie? recipie,
+    String? recipie,
   }) {
     return Photo(
       id: id ?? this.id,
@@ -35,7 +34,6 @@ class Photo {
 
   Map<String, dynamic> toJson() {
     final json = _$PhotoToJson(this);
-    json['recipie'] = recipie.id;
     return json;
   }
 
