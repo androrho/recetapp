@@ -1,15 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:recetapp/model/recipie.dart';
 
 part 'step.g.dart';
 
 @JsonSerializable()
 class Step {
   final String? id;
-  int position;
-  Recipie recipie;
-  String text;
+  int? position;
+  String? recipie;
+  String? text;
 
   Step({
     this.id,
@@ -21,7 +19,7 @@ class Step {
   Step copyWith({
     String? id,
     int? position,
-    Recipie? recipie,
+    String? recipie,
     String? text,
   }) {
     return Step(
@@ -36,7 +34,6 @@ class Step {
 
   Map<String, dynamic> toJson() {
     final json = _$StepToJson(this);
-    json['recipie'] = recipie.id;
     return json;
   }
 
