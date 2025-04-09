@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/recipie.dart';
+import 'package:recetapp/model/recipie.dart';
 
 class RecipiesService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
