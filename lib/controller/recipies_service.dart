@@ -29,7 +29,13 @@ class RecipiesService {
       data['id'] = doc.id;
       return Recipie.fromJson(data);
     }
-    return new Recipie(id: "0", description: "n/a", personNumber: 0, title: "n/a", user: "0");
+    return Recipie(
+      id: "0",
+      description: "n/a",
+      personNumber: 0,
+      title: "n/a",
+      user: "0",
+    );
   }
 
   Future<void> update(String id, Recipie object) async {
