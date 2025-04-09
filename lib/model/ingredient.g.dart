@@ -8,10 +8,10 @@ part of 'ingredient.dart';
 
 Ingredient _$IngredientFromJson(Map<String, dynamic> json) => Ingredient(
   id: json['id'] as String?,
-  name: json['name'] as String,
-  quantity: (json['quantity'] as num).toDouble(),
-  quantityType: json['quantityType'] as String,
-  recipie: Recipie.fromJson(json['recipie'] as Map<String, dynamic>),
+  name: json['name'] as String?,
+  quantity: (json['quantity'] as num?)?.toDouble(),
+  quantityType: json['quantityType'] as String?,
+  recipie: json['recipie'] as String?,
 );
 
 Map<String, dynamic> _$IngredientToJson(Ingredient instance) =>

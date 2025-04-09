@@ -1,15 +1,14 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:recetapp/model/recipie.dart';
 
 part 'ingredient.g.dart';
 
 @JsonSerializable()
 class Ingredient {
   final String? id;
-  String name;
-  double quantity;
-  String quantityType;
-  Recipie recipie;
+  String? name;
+  double? quantity;
+  String? quantityType;
+  String? recipie;
 
   Ingredient({
     this.id,
@@ -24,7 +23,7 @@ class Ingredient {
     String? name,
     double? quantity,
     String? quantityType,
-    Recipie? recipie,
+    String? recipie,
   }) {
     return Ingredient(
       id: id ?? this.id,
@@ -39,7 +38,6 @@ class Ingredient {
 
   Map<String, dynamic> toJson() {
     final json = _$IngredientToJson(this);
-    json['recipie'] = recipie.id;
     return json;
   }
 
