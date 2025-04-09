@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/photo.dart';
+import 'package:recetapp/model/photo.dart';
 
 class PhotosService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -13,15 +13,13 @@ class PhotosService {
     await docRef.set(newObject.toJson());
   }
 
-  Stream<List<Photo>> read() {
-    return _db.collection(_collection).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        // Si necesitas guardar el ID del documento en tu modelo, lo asignas aquí
-        data['id'] = doc.id;
-        return Photo.fromJson(data);
-      }).toList();
-    });
+  Future<List<Photo>> read() async {
+    final snapshot = await _db.collection(_collection).get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Photo.fromJson(data);
+    }).toList();
   }
 
   Future<Photo?> readById(String id) async {
@@ -31,7 +29,7 @@ class PhotosService {
       data['id'] = doc.id;
       return Photo.fromJson(data);
     }
-    return null;
+    return Photo(id: "0", path: "null", position: 0, recipie: "0");
   }
 
   Future<void> update(String id, Photo object) async {

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:recetapp/model/ingredient.dart';
 
 class IngredientsService {
@@ -12,15 +13,13 @@ class IngredientsService {
     await docRef.set(newObject.toJson());
   }
 
-  Stream<List<Ingredient>> read() {
-    return _db.collection(_collection).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        // Si necesitas guardar el ID del documento en tu modelo, lo asignas aquí
-        data['id'] = doc.id;
-        return Ingredient.fromJson(data);
-      }).toList();
-    });
+  Future<List<Ingredient>> read() async {
+    final snapshot = await _db.collection(_collection).get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Ingredient.fromJson(data);
+    }).toList();
   }
 
   Future<Ingredient?> readById(String id) async {
@@ -30,7 +29,13 @@ class IngredientsService {
       data['id'] = doc.id;
       return Ingredient.fromJson(data);
     }
-    return null;
+    return Ingredient(
+      id: "0",
+      name: "n/a",
+      quantity: 0,
+      quantityType: "n/a",
+      recipie: "0",
+    );
   }
 
   Future<void> update(String id, Ingredient object) async {

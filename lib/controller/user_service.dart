@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../model/user.dart';
+import 'package:recetapp/model/user.dart';
 
 class UserService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -13,14 +13,13 @@ class UserService {
     await docRef.set(newObject.toJson());
   }
 
-  Stream<List<User>> read() {
-    return _db.collection(_collection).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return User.fromJson(data);
-      }).toList();
-    });
+  Future<List<User>> read() async {
+    final snapshot = await _db.collection(_collection).get();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return User.fromJson(data);
+    }).toList();
   }
 
   Future<User?> readById(String id) async {
@@ -30,7 +29,7 @@ class UserService {
       data['id'] = doc.id;
       return User.fromJson(data);
     }
-    return null;
+    return User(id: "0", displayName: "n/a", login: "", password: "");
   }
 
   Future<void> update(String id, User object) async {
