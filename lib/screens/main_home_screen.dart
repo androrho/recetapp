@@ -17,7 +17,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
 
   final List<Widget> widgetOptions = const [
     MyRecipiesScreen(),
-    AddRecipieScreen(),
     CommunityScreen(),
     MyAccountScreen(),
   ];
@@ -42,10 +41,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
           NavigationDestination(
             icon: Icon(Icons.home),
             label: 'Mis recetas',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.add_rounded),
-            label: 'Añadir recetas',
           ),
           NavigationDestination(
             icon: Icon(Icons.people),
