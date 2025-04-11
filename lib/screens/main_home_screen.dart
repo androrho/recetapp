@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'bottom_screens/my_recipies_screen.dart';
-import 'bottom_screens/add_recipie_screen.dart';
 import 'bottom_screens/community_screen.dart';
 import 'bottom_screens/my_account_screen.dart';
 
