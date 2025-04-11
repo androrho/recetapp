@@ -3,6 +3,18 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:recetapp/model/recipie.dart';
 
+import '../../controller/recipies_service.dart';
+
+class ListItem {
+  bool isChecked;
+  TextEditingController controller;
+
+  ListItem({
+    this.isChecked = false,
+    required this.controller,
+  });
+}
+
 class AddRecipieScreen extends StatefulWidget {
   const AddRecipieScreen({Key? key}) : super(key: key);
 
@@ -17,11 +29,16 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
   final _descriptionController = TextEditingController();
   final _numberController = TextEditingController();
 
+  final List<ListItem> _itemsList = [];
+
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _numberController.dispose();
+    for (final item in _itemsList) {
+      item.controller.dispose();
+    }
     super.dispose();
   }
 
@@ -34,6 +51,9 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         personNumber: personNumber,
         user: "0", //TODO: Add user id to recipie
       );
+
+      await RecipiesService().create(newRecipie);
+
       Fluttertoast.showToast(
         msg: "Receta añadida",
         toastLength: Toast.LENGTH_SHORT,
@@ -45,6 +65,21 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
 
       Navigator.pop(context);
     }
+  }
+
+  void _addItem() {
+    setState(() {
+      _itemsList.add(
+        ListItem(controller: TextEditingController()),
+      );
+    });
+  }
+
+  /// Eliminar un ítem de la lista
+  void _removeItem(int index) {
+    setState(() {
+      _itemsList.removeAt(index);
+    });
   }
 
   @override
@@ -85,11 +120,15 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
               maxWidth: 450,
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 16.0),
+              padding: EdgeInsets.symmetric(
+                horizontal: horizontalPadding,
+                vertical: 16.0,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
+                    // 1) Campo de texto para el título
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
@@ -104,6 +143,8 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
+
+                    // 2) Campo de texto para la descripción
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -119,6 +160,8 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
+
+                    // 4) Último campo de texto: Número de personas
                     TextFormField(
                       controller: _numberController,
                       decoration: const InputDecoration(
@@ -136,7 +179,41 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 24),
+
+                    const SizedBox(height: 16),
+                    Column(
+                      children: [
+                        for (int i = 0; i < _itemsList.length; i++)
+                          Row(
+                            children: [
+                              // Campo de texto expandible
+                              Expanded(
+                                child: TextFormField(
+                                  controller: _itemsList[i].controller,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Ingrediente',
+                                    border: UnderlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                              // Botón X para eliminar
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                onPressed: () => _removeItem(i),
+                              ),
+                            ],
+                          ),
+                        // Botón para añadir un nuevo ítem
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Añadir ingrediente'),
+                            onPressed: _addItem,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
