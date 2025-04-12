@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 import 'package:recetapp/model/recipie.dart';
-
 import '../../controller/recipies_service.dart';
 
-class ListItem {
+/// Clase auxiliar para cada paso.
+/// Cada paso se representa con un único controlador.
+class ListStepItem {
+  final TextEditingController stepController;
+
+  ListStepItem({required this.stepController});
+}
+
+/// Clase auxiliar para cada ingrediente.
+/// Cada elemento tendrá tres controladores: para el nombre, la cantidad y el tipo de unidad.
+class ListIngredientItem {
   final TextEditingController ingredientController;
   final TextEditingController quantityController;
   final TextEditingController unitTypeController;
 
-  ListItem({
+  ListIngredientItem({
     required this.ingredientController,
     required this.quantityController,
     required this.unitTypeController,
@@ -31,14 +39,21 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
   final _descriptionController = TextEditingController();
   final _numberController = TextEditingController();
 
-  final List<ListItem> _itemsList = [];
+  // Lista dinámica de pasos
+  final List<ListStepItem> _stepsList = [];
+
+  // Lista dinámica de ingredientes
+  final List<ListIngredientItem> _ingredientsList = [];
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _numberController.dispose();
-    for (final item in _itemsList) {
+    for (final step in _stepsList) {
+      step.stepController.dispose();
+    }
+    for (final item in _ingredientsList) {
       item.ingredientController.dispose();
       item.quantityController.dispose();
       item.unitTypeController.dispose();
@@ -53,9 +68,11 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         title: _titleController.text,
         description: _descriptionController.text,
         personNumber: personNumber,
-        user: "0", //TODO: Add user id to recipie
+        user: "0", // TODO: Asignar el id real del usuario
       );
 
+      // Aquí se crea la receta. Luego podrías guardar también los ingredientes y pasos,
+      // asociándolos al id de la receta recién creada, según tu lógica.
       await RecipiesService().create(newRecipie);
 
       Fluttertoast.showToast(
@@ -71,26 +88,40 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
     }
   }
 
-  void _addItem() {
+  void _addIngredient() {
     setState(() {
-      _itemsList.add(ListItem(
-        ingredientController: TextEditingController(),
-        quantityController: TextEditingController(),
-        unitTypeController: TextEditingController(),
-      ));
+      _ingredientsList.add(
+        ListIngredientItem(
+          ingredientController: TextEditingController(),
+          quantityController: TextEditingController(),
+          unitTypeController: TextEditingController(),
+        ),
+      );
     });
   }
 
-  void _removeItem(int index) {
+  void _removeIngredient(int index) {
     setState(() {
-      _itemsList.removeAt(index);
+      _ingredientsList.removeAt(index);
+    });
+  }
+
+  void _addStep() {
+    setState(() {
+      _stepsList.add(ListStepItem(stepController: TextEditingController()));
+    });
+  }
+
+  void _removeStep(int index) {
+    setState(() {
+      _stepsList.removeAt(index);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
 
     return Scaffold(
@@ -98,11 +129,13 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
+            // Botón para cerrar
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
             ),
-            Expanded(child: Text('Nueva Receta')),
+            const Expanded(child: Text('Nueva Receta')),
+            // Botón para guardar la receta
             ElevatedButton(
               onPressed: _saveRecipie,
               style: ElevatedButton.styleFrom(
@@ -121,9 +154,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
       body: SingleChildScrollView(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 450,
-            ),
+            constraints: const BoxConstraints(maxWidth: 450),
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: horizontalPadding,
@@ -132,9 +163,9 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
-                    // 1) Campo de texto para el título
+                    // Campo Título
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
@@ -149,8 +180,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // 2) Campo de texto para la descripción
+                    // Campo Descripción
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -166,8 +196,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // 3) Campo texto número de personas
+                    // Campo Número de personas
                     TextFormField(
                       controller: _numberController,
                       decoration: const InputDecoration(
@@ -187,27 +216,82 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // 4) Lista para añadir ingredintes
+                    // Sección para Pasos
+                    Text("Pasos"),
+                    const SizedBox(height: 8),
                     Column(
                       children: [
-                        for (int i = 0; i < _itemsList.length; i++)
+                        for (int i = 0; i < _stepsList.length; i++)
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.onSecondary,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceVariant,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _stepsList[i].stepController,
+                                      decoration: const InputDecoration(
+                                        hintText: 'Paso',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () => _removeStep(i),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        // Botón para añadir un paso
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Añadir paso'),
+                            onPressed: _addStep,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Sección para Ingredientes
+                    Text("Ingredientes"),
+                    const SizedBox(height: 8),
+                    Column(
+                      children: [
+                        for (int i = 0; i < _ingredientsList.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceVariant,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Column(
                                 children: [
-                                  // Fila superior: campo que ocupa toda la línea + botón X
+                                  // Fila superior: Campo para el nombre del ingrediente y botón de eliminación
                                   Row(
                                     children: [
                                       Expanded(
                                         child: TextFormField(
                                           controller:
-                                          _itemsList[i].ingredientController,
+                                              _ingredientsList[i]
+                                                  .ingredientController,
                                           decoration: const InputDecoration(
                                             hintText: 'Ingrediente',
                                             border: OutlineInputBorder(),
@@ -216,20 +300,21 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.close),
-                                        onPressed: () => _removeItem(i),
+                                        onPressed: () => _removeIngredient(i),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  // Fila inferior: dos campos para cantidad y tipo de unidades
+                                  // Fila inferior: Dos campos para cantidad/unidades y tipo de unidades
                                   Row(
                                     children: [
                                       Expanded(
                                         child: TextFormField(
                                           controller:
-                                          _itemsList[i].quantityController,
+                                              _ingredientsList[i]
+                                                  .quantityController,
                                           decoration: const InputDecoration(
-                                            hintText: 'Unidades',
+                                            hintText: 'Cantidad / Unidades',
                                             border: OutlineInputBorder(),
                                           ),
                                         ),
@@ -238,9 +323,10 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                       Expanded(
                                         child: TextFormField(
                                           controller:
-                                          _itemsList[i].unitTypeController,
+                                              _ingredientsList[i]
+                                                  .unitTypeController,
                                           decoration: const InputDecoration(
-                                            hintText: 'Tipo',
+                                            hintText: 'Tipo de unidades',
                                             border: OutlineInputBorder(),
                                           ),
                                         ),
@@ -251,13 +337,13 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                               ),
                             ),
                           ),
-                        // Botón para añadir un nuevo ingrediente
+                        // Botón para añadir ingrediente
                         Align(
                           alignment: Alignment.centerLeft,
                           child: ElevatedButton.icon(
                             icon: const Icon(Icons.add),
                             label: const Text('Añadir ingrediente'),
-                            onPressed: _addItem,
+                            onPressed: _addIngredient,
                           ),
                         ),
                       ],
