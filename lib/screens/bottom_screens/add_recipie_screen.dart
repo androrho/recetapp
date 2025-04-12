@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recetapp/model/recipie.dart';
+import '../../controller/ingredients_service.dart';
 import '../../controller/recipies_service.dart';
+import '../../controller/steps_service.dart';
+import '../../model/ingredient.dart';
+import 'package:recetapp/model/step.dart' as appStep;
 
 /// Clase auxiliar para cada paso.
 /// Cada paso se representa con un único controlador.
@@ -71,9 +75,33 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         user: "0", // TODO: Asignar el id real del usuario
       );
 
-      // Aquí se crea la receta. Luego podrías guardar también los ingredientes y pasos,
-      // asociándolos al id de la receta recién creada, según tu lógica.
-      await RecipiesService().create(newRecipie);
+      // Se asume que este método devuelve el id de la receta creada
+      final String recipeId = await RecipiesService().create(newRecipie);
+
+      // Guardamos cada ingrediente asociado a la receta
+      for (final ingredient in _ingredientsList) {
+        final double quantity =
+            double.tryParse(ingredient.quantityController.text) ?? 0.0;
+        final ingredientObject = Ingredient(
+          name: ingredient.ingredientController.text,
+          quantity: quantity,
+          quantityType: ingredient.unitTypeController.text,
+          recipie: recipeId,
+        );
+        await IngredientsService().create(ingredientObject);
+      }
+
+      // Guardamos cada paso asociado, asignando la posición de forma incremental
+      for (int i = 0; i < _stepsList.length; i++) {
+        final stepObject = appStep.Step(
+          position: i + 1,
+          recipie: recipeId,
+          text: _stepsList[i].stepController.text,
+        );
+        await StepsService().create(stepObject);
+      }
+
+      Navigator.pop(context);
 
       Fluttertoast.showToast(
         msg: "Receta añadida",
@@ -83,8 +111,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         backgroundColor: Colors.black,
         textColor: Colors.white,
       );
-
-      Navigator.pop(context);
     }
   }
 
@@ -174,7 +200,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese un título';
+                          return 'Ingrese un título';
                         }
                         return null;
                       },
@@ -190,7 +216,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       maxLines: 4,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese una descripción';
+                          return 'Ingrese una descripción';
                         }
                         return null;
                       },
@@ -206,10 +232,10 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese un número';
+                          return 'Ingrese un número';
                         }
                         if (int.tryParse(value) == null) {
-                          return 'Debe ingresar un número válido';
+                          return 'Ingrese un número válido';
                         }
                         return null;
                       },
@@ -230,7 +256,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                 color:
                                     Theme.of(
                                       context,
-                                    ).colorScheme.surfaceVariant,
+                                    ).colorScheme.secondaryContainer,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Row(
@@ -279,7 +305,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                 color:
                                     Theme.of(
                                       context,
-                                    ).colorScheme.surfaceVariant,
+                                    ).colorScheme.secondaryContainer,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Column(
@@ -292,10 +318,18 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                           controller:
                                               _ingredientsList[i]
                                                   .ingredientController,
+                                          keyboardType: TextInputType.number,
                                           decoration: const InputDecoration(
                                             hintText: 'Ingrediente',
                                             border: OutlineInputBorder(),
+
                                           ),
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Ingrese un ingrediente';
+                                            }
+                                            return null;
+                                          },
                                         ),
                                       ),
                                       IconButton(
@@ -314,9 +348,19 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                               _ingredientsList[i]
                                                   .quantityController,
                                           decoration: const InputDecoration(
-                                            hintText: 'Cantidad / Unidades',
+                                            labelText: 'Cantidad',
                                             border: OutlineInputBorder(),
                                           ),
+                                          keyboardType: TextInputType.number,
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Ingrese un número';
+                                            }
+                                            if (int.tryParse(value) == null) {
+                                              return 'Ingrese un número válido';
+                                            }
+                                            return null;
+                                          },
                                         ),
                                       ),
                                       const SizedBox(width: 8),
@@ -326,9 +370,16 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                               _ingredientsList[i]
                                                   .unitTypeController,
                                           decoration: const InputDecoration(
-                                            hintText: 'Tipo de unidades',
+                                            hintText: 'Tipo',
                                             border: OutlineInputBorder(),
+
                                           ),
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Ingrese un tipo';
+                                            }
+                                            return null;
+                                          },
                                         ),
                                       ),
                                     ],
