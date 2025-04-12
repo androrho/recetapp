@@ -6,11 +6,12 @@ class RecipiesService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String _collection = 'recipies';
 
-  Future<void> create(Recipie object) async {
+  Future<String> create(Recipie object) async {
     final collection = FirebaseFirestore.instance.collection(_collection);
     final docRef = collection.doc();
     final newObject = object.copyWith(id: docRef.id);
     await docRef.set(newObject.toJson());
+    return docRef.id;
   }
 
   Future<List<Recipie>> read() async {
