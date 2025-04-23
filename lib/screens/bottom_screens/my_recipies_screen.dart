@@ -47,7 +47,7 @@ class MyRecipiesScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => RecipieDetailScreen(
+                            builder: (_) => RecipeDetailScreen(
                               recipeId: r.id!, // paso el id
                             ),
                           ),
