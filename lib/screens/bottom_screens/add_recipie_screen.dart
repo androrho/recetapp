@@ -74,8 +74,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         personNumber: personNumber,
         user: "0", // TODO: Asignar el id real del usuario
       );
-
-      // Se asume que este método devuelve el id de la receta creada
+      
       final String recipeId = await RecipiesService().create(newRecipie);
 
       // Guardamos cada ingrediente asociado a la receta
