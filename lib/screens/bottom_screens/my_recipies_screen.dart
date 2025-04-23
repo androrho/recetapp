@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:recetapp/model/recipie.dart';
-import '../../controller/recipies_service.dart';
+import 'package:recetapp/model/recipe.dart';
+import 'package:recetapp/screens/bottom_screens/recipie_detail_screen.dart';
+import '../../controller/recipes_service.dart';
 import 'add_recipie_screen.dart';
+
 
 class MyRecipiesScreen extends StatelessWidget {
   const MyRecipiesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Mismo cálculo de padding horizontal que en AddRecipieScreen
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
-
-    final service = RecipiesService();
+    final service = RecipesService();
 
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: FutureBuilder<List<Recipie>>(
+        child: FutureBuilder<List<Recipe>>(
           future: service.read(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -42,56 +42,69 @@ class MyRecipiesScreen extends StatelessWidget {
                       minWidth: 300,
                       maxWidth: 600,
                     ),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceVariant,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          // Título
-                          Text(
-                            r.title ?? '',
-                            style: Theme.of(context).textTheme.titleLarge,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => RecipieDetailScreen(
+                              recipeId: r.id!, // paso el id
+                            ),
                           ),
-                          const SizedBox(height: 8),
-                          // Descripción + Número con icono
-                          Row(
-                            children: [
-                              // Descripción (flex mayor)
-                              Expanded(
-                                flex: 3,
-                                child: Text(
-                                  r.description ?? '',
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                        );
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Título
+                            Text(
+                              r.title ?? '',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 8),
+                            // Descripción + Icono de personas
+                            Row(
+                              children: [
+                                Expanded(
+                                  flex: 3,
+                                  child: Text(
+                                    r.description ?? '',
+                                    style: Theme.of(context).textTheme.bodyMedium,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 12),
-                              // Número de personas + icono de grupo
-                              Expanded(
-                                flex: 1,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '${r.personNumber ?? 0}',
-                                      style: Theme.of(context).textTheme.bodyMedium,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Icon(
-                                      Icons.group,
-                                      size: 20,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                    ),
-                                  ],
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        '${r.personNumber ?? 0}',
+                                        style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Icon(
+                                        Icons.group,
+                                        size: 20,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

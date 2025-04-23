@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:recetapp/model/recipie.dart';
-import '../../controller/recipies_service.dart';
+import 'package:recetapp/model/recipe.dart';
+import '../../controller/recipes_service.dart';
 
 class CommunityScreen extends StatelessWidget {
   const CommunityScreen({Key? key}) : super(key: key);
@@ -12,12 +12,12 @@ class CommunityScreen extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
 
-    final service = RecipiesService();
+    final service = RecipesService();
 
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: FutureBuilder<List<Recipie>>(
+        child: FutureBuilder<List<Recipe>>(
           future: service.read(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

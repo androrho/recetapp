@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'recipie.dart';
+part of 'recipe.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Recipie _$RecipieFromJson(Map<String, dynamic> json) => Recipie(
+Recipe _$RecipeFromJson(Map<String, dynamic> json) => Recipe(
   id: json['id'] as String?,
   description: json['description'] as String?,
   personNumber: (json['personNumber'] as num?)?.toInt(),
@@ -14,7 +14,7 @@ Recipie _$RecipieFromJson(Map<String, dynamic> json) => Recipie(
   user: json['user'] as String?,
 );
 
-Map<String, dynamic> _$RecipieToJson(Recipie instance) => <String, dynamic>{
+Map<String, dynamic> _$RecipeToJson(Recipe instance) => <String, dynamic>{
   'id': instance.id,
   'description': instance.description,
   'personNumber': instance.personNumber,

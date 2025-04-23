@@ -1,16 +1,16 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'recipie.g.dart';
+part 'recipe.g.dart';
 
 @JsonSerializable()
-class Recipie {
+class Recipe {
   final String? id;
   String? description;
   int? personNumber;
   String? title;
   String? user;
 
-  Recipie({
+  Recipe({
     this.id,
     this.description,
     this.personNumber,
@@ -18,14 +18,14 @@ class Recipie {
     this.user,
   });
 
-  Recipie copyWith({
+  Recipe copyWith({
     String? id,
     String? description,
     int? personNumber,
     String? title,
     String? user,
   }) {
-    return Recipie(
+    return Recipe(
       id: id ?? this.id,
       description: description ?? this.description,
       personNumber: personNumber ?? this.personNumber,
@@ -34,15 +34,15 @@ class Recipie {
     );
   }
 
-  factory Recipie.fromJson(Map<String, dynamic> json) => _$RecipieFromJson(json);
+  factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
 
   Map<String, dynamic> toJson() {
-    final json = _$RecipieToJson(this);
+    final json = _$RecipeToJson(this);
     return json;
   }
 
   @override
   String toString() {
-    return 'recipies/$id';
+    return 'recipes/$id';
   }
 }

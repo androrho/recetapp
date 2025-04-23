@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:recetapp/model/recipie.dart';
+import 'package:recetapp/model/recipe.dart';
 
-class RecipiesService {
+class RecipesService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final String _collection = 'recipies';
 
-  Future<String> create(Recipie object) async {
+  Future<String> create(Recipe object) async {
     final collection = FirebaseFirestore.instance.collection(_collection);
     final docRef = collection.doc();
     final newObject = object.copyWith(id: docRef.id);
@@ -14,23 +14,23 @@ class RecipiesService {
     return docRef.id;
   }
 
-  Future<List<Recipie>> read() async {
+  Future<List<Recipe>> read() async {
     final snapshot = await _db.collection(_collection).get();
     return snapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
-      return Recipie.fromJson(data);
+      return Recipe.fromJson(data);
     }).toList();
   }
 
-  Future<Recipie> readById(String id) async {
+  Future<Recipe> readById(String id) async {
     final doc = await _db.collection(_collection).doc(id).get();
     if (doc.exists) {
       final data = doc.data()!;
       data['id'] = doc.id;
-      return Recipie.fromJson(data);
+      return Recipe.fromJson(data);
     }
-    return Recipie(
+    return Recipe(
       id: "0",
       description: "n/a",
       personNumber: 0,
@@ -39,7 +39,7 @@ class RecipiesService {
     );
   }
 
-  Future<void> update(String id, Recipie object) async {
+  Future<void> update(String id, Recipe object) async {
     await _db.collection(_collection).doc(id).update(object.toJson());
   }
 
