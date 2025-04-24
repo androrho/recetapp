@@ -31,7 +31,44 @@ class RecipeDetailScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             elevation: 4,
-            onSelected: (_) {},
+            onSelected: (value) async {
+              if (value == 'delete') {
+                // Pedimos confirmación
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('¿Eliminar receta?'),
+                    content: const Text('Se eliminará la receta y todos sus datos.'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
+                      TextButton(onPressed: () => Navigator.pop(ctx, true),  child: const Text('Eliminar')),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  final recipeId = this.recipeId;
+
+                  // 1. Borrar ingredientes asociados
+                  final ingSvc = IngredientsService();
+                  final allIng = await ingSvc.read();
+                  for (final ing in allIng.where((i) => i.recipie == recipeId)) {
+                    await ingSvc.delete(ing.id!);
+                  }
+                  // 2. Borrar pasos asociados
+                  final stepSvc = StepsService();
+                  final allSteps = await stepSvc.read();
+                  for (final st in allSteps.where((s) => s.recipie == recipeId)) {
+                    await stepSvc.delete(st.id!);
+                  }
+                  // 3. Borrar la receta
+                  await RecipesService().delete(recipeId);
+
+                  // Volvemos atrás
+                  Navigator.pop(context);
+                }
+              }
+            },
             itemBuilder: (_) => const [
               PopupMenuItem(value: 'edit', child: Text('Editar')),
               PopupMenuItem(value: 'delete', child: Text('Eliminar')),
