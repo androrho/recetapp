@@ -74,7 +74,7 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         personNumber: personNumber,
         user: "0", // TODO: Asignar el id real del usuario
       );
-      
+
       final String recipeId = await RecipesService().create(newRecipie);
 
       // Guardamos cada ingrediente asociado a la receta
@@ -154,7 +154,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            // Botón para cerrar
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
@@ -190,7 +189,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Campo Título
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
@@ -205,7 +203,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    // Campo Descripción
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -221,7 +218,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    // Campo Número de personas
                     TextFormField(
                       controller: _numberController,
                       decoration: const InputDecoration(
@@ -240,8 +236,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // Sección para Pasos
                     Text("Pasos"),
                     const SizedBox(height: 8),
                     Column(
@@ -253,9 +247,9 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                               padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
                                 color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.secondaryContainer,
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.secondaryContainer,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Row(
@@ -277,7 +271,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                               ),
                             ),
                           ),
-                        // Botón para añadir un paso
                         Align(
                           alignment: Alignment.centerLeft,
                           child: ElevatedButton.icon(
@@ -289,8 +282,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Sección para Ingredientes
                     Text("Ingredientes"),
                     const SizedBox(height: 8),
                     Column(
@@ -320,10 +311,10 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                           decoration: const InputDecoration(
                                             hintText: 'Ingrediente',
                                             border: OutlineInputBorder(),
-
                                           ),
                                           validator: (value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return 'Ingrese un ingrediente';
                                             }
                                             return null;
@@ -351,7 +342,8 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                           ),
                                           keyboardType: TextInputType.number,
                                           validator: (value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return 'Ingrese un número';
                                             }
                                             if (int.tryParse(value) == null) {
@@ -370,10 +362,10 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                           decoration: const InputDecoration(
                                             hintText: 'Tipo',
                                             border: OutlineInputBorder(),
-
                                           ),
                                           validator: (value) {
-                                            if (value == null || value.isEmpty) {
+                                            if (value == null ||
+                                                value.isEmpty) {
                                               return 'Ingrese un tipo';
                                             }
                                             return null;
@@ -386,7 +378,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                               ),
                             ),
                           ),
-                        // Botón para añadir ingrediente
                         Align(
                           alignment: Alignment.centerLeft,
                           child: ElevatedButton.icon(
