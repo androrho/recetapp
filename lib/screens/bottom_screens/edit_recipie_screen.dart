@@ -81,8 +81,8 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     // 4) Carga todos los pasos y filtra y ordena
     final allSt = await StepsService().read();
     final mySt =
-        allSt.where((s) => s.recipie == widget.recipeId).toList()
-          ..sort((a, b) => (a.position ?? 0).compareTo(b.position ?? 0));
+    allSt.where((s) => s.recipie == widget.recipeId).toList()
+      ..sort((a, b) => (a.position ?? 0).compareTo(b.position ?? 0));
     for (var s in mySt) {
       _stepsList.add(
         ListStepItem(stepController: TextEditingController(text: s.text)),
@@ -92,8 +92,90 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     setState(() => _isLoading = false);
   }
 
-  Future<void> _updateRecipie() async {
-    // Aquí implementa tu lógica de actualización
+  Future<void> _updateFullRecipe() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final recipeId = widget.recipeId;
+
+    _deleteFullRecipe(recipeId);
+
+    _saveFullRecipe();
+
+    Fluttertoast.showToast(msg: 'Receta actualizada correctamente');
+    Navigator.pop(context);
+  }
+
+  Future<void> _deleteFullRecipe(String recipeId) async {
+    final recipeId = widget.recipeId;
+    _deleteIngredients(recipeId);
+    _deleteSteps(recipeId);
+    _deleteRecipe(recipeId);
+  }
+
+  Future<void> _deleteIngredients(String recipeId) async {
+    final ingSvc = IngredientsService();
+    final allIng = await ingSvc.read();
+    for (final ing in allIng.where((i) => i.recipie == recipeId)) {
+      await ingSvc.delete(ing.id!);
+    }
+  }
+
+  Future<void> _deleteSteps(String recipeId) async {
+    final stepSvc = StepsService();
+    final allSteps = await stepSvc.read();
+    for (final st in allSteps.where((s) => s.recipie == recipeId)) {
+      await stepSvc.delete(st.id!);
+    }
+  }
+
+  Future<void> _deleteRecipe(String recipeId) async {
+    final recipeService = RecipesService();
+    await recipeService.delete(recipeId);
+  }
+
+  Future<void> _saveFullRecipe() async {
+    final String recipeId = await _saveRecipe();
+    _saveIngredients(recipeId);
+    _saveSteps(recipeId);
+  }
+
+  Future<String> _saveRecipe() async {
+    int personNumber = int.tryParse(_numberController.text) ?? 0;
+    final newRecipie = Recipe(
+      title: _titleController.text,
+      description: _descriptionController.text,
+      personNumber: personNumber,
+      user: "0", // TODO: Asignar el id real del usuario
+    );
+
+    final String recipeId = await RecipesService().create(newRecipie);
+
+    return recipeId;
+  }
+
+  Future<void> _saveIngredients(String recipeId) async {
+    for (final ingredient in _ingredientsList) {
+      final double quantity =
+          double.tryParse(ingredient.quantityController.text) ?? 0.0;
+      final ingredientObject = Ingredient(
+        name: ingredient.ingredientController.text,
+        quantity: quantity,
+        quantityType: ingredient.unitTypeController.text,
+        recipie: recipeId,
+      );
+      await IngredientsService().create(ingredientObject);
+    }
+  }
+
+  Future<void> _saveSteps(String recipeId) async {
+    for (int i = 0; i < _stepsList.length; i++) {
+      final stepObject = appStep.Step(
+        position: i + 1,
+        recipie: recipeId,
+        text: _stepsList[i].stepController.text,
+      );
+      await StepsService().create(stepObject);
+    }
   }
 
   void _addIngredient() {
@@ -144,13 +226,9 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLandscape =
+    final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final horizontalPadding = isLandscape ? 50.0 : 45.0;
-
-    if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    final double horizontalPadding = isLandscape ? 50.0 : 45.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -161,15 +239,16 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
             ),
-            const Expanded(child: Text('Editar Receta')),
+            const Expanded(child: Text('Nueva Receta')),
+            // Botón para guardar la receta
             ElevatedButton(
-              onPressed: _updateRecipie,
+              onPressed: _updateFullRecipe,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+                  horizontal: 16.0,
+                  vertical: 8.0,
                 ),
               ),
               child: const Text('Guardar'),
@@ -184,29 +263,27 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
             child: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: horizontalPadding,
-                vertical: 16,
+                vertical: 16.0,
               ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Título
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
                         labelText: 'Título',
                         border: OutlineInputBorder(),
                       ),
-                      validator:
-                          (v) =>
-                              (v == null || v.isEmpty)
-                                  ? 'Ingrese un título'
-                                  : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Ingrese un título';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 16),
-
-                    // Descripción
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -214,15 +291,14 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
                         border: OutlineInputBorder(),
                       ),
                       maxLines: 4,
-                      validator:
-                          (v) =>
-                              (v == null || v.isEmpty)
-                                  ? 'Ingrese una descripción'
-                                  : null,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Ingrese una descripción';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 16),
-
-                    // Número de personas
                     TextFormField(
                       controller: _numberController,
                       decoration: const InputDecoration(
@@ -230,158 +306,168 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
                         border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Ingrese un número';
-                        return int.tryParse(v) == null
-                            ? 'Número inválido'
-                            : null;
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Ingrese un número';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Ingrese un número válido';
+                        }
+                        return null;
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // Pasos
-                    Text(
-                      'Pasos',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+                    Text("Pasos"),
                     const SizedBox(height: 8),
-                    for (int i = 0; i < _stepsList.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color:
+                    Column(
+                      children: [
+                        for (int i = 0; i < _stepsList.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color:
                                 Theme.of(
                                   context,
                                 ).colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: TextFormField(
-                                  controller: _stepsList[i].stepController,
-                                  decoration: const InputDecoration(
-                                    hintText: 'Paso',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                ),
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () => _removeStep(i),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.add),
-                        label: const Text('Añadir paso'),
-                        onPressed: _addStep,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Ingredientes
-                    Text(
-                      'Ingredientes',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 8),
-                    for (int i = 0; i < _ingredientsList.length; i++)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color:
-                                Theme.of(
-                                  context,
-                                ).colorScheme.secondaryContainer,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
+                              child: Row(
                                 children: [
                                   Expanded(
                                     child: TextFormField(
-                                      controller:
-                                          _ingredientsList[i]
-                                              .ingredientController,
+                                      controller: _stepsList[i].stepController,
                                       decoration: const InputDecoration(
-                                        hintText: 'Ingrediente',
+                                        hintText: 'Paso',
                                         border: OutlineInputBorder(),
                                       ),
-                                      validator:
-                                          (v) =>
-                                              (v == null || v.isEmpty)
-                                                  ? 'Ingrese un ingrediente'
-                                                  : null,
                                     ),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.close),
-                                    onPressed: () => _removeIngredient(i),
+                                    onPressed: () => _removeStep(i),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller:
-                                          _ingredientsList[i]
-                                              .quantityController,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Cantidad',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      keyboardType: TextInputType.number,
-                                      validator:
-                                          (v) =>
-                                              (v == null ||
-                                                      v.isEmpty ||
-                                                      int.tryParse(v) == null)
-                                                  ? 'Cantidad inválida'
-                                                  : null,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller:
-                                          _ingredientsList[i]
-                                              .unitTypeController,
-                                      decoration: const InputDecoration(
-                                        hintText: 'Tipo',
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      validator:
-                                          (v) =>
-                                              (v == null || v.isEmpty)
-                                                  ? 'Ingrese un tipo'
-                                                  : null,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                            ),
+                          ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Añadir paso'),
+                            onPressed: _addStep,
                           ),
                         ),
-                      ),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.add),
-                        label: const Text('Añadir ingrediente'),
-                        onPressed: _addIngredient,
-                      ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text("Ingredientes"),
+                    const SizedBox(height: 8),
+                    Column(
+                      children: [
+                        for (int i = 0; i < _ingredientsList.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color:
+                                Theme.of(
+                                  context,
+                                ).colorScheme.secondaryContainer,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: Column(
+                                children: [
+                                  // Fila superior: Campo para el nombre del ingrediente y botón de eliminación
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller:
+                                          _ingredientsList[i]
+                                              .ingredientController,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Ingrediente',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Ingrese un ingrediente';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () => _removeIngredient(i),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  // Fila inferior: Dos campos para cantidad/unidades y tipo de unidades
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller:
+                                          _ingredientsList[i]
+                                              .quantityController,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Cantidad',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                          keyboardType: TextInputType.number,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Ingrese un número';
+                                            }
+                                            if (double.tryParse(value) == null) {
+                                              return 'Ingrese un número válido';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller:
+                                          _ingredientsList[i]
+                                              .unitTypeController,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Tipo',
+                                            border: OutlineInputBorder(),
+                                          ),
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Ingrese un tipo';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Añadir ingrediente'),
+                            onPressed: _addIngredient,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                   ],
