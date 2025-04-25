@@ -317,7 +317,6 @@ class _AddRecipieScreenState extends State<AddRecipieScreen> {
                                           controller:
                                               _ingredientsList[i]
                                                   .ingredientController,
-                                          keyboardType: TextInputType.number,
                                           decoration: const InputDecoration(
                                             hintText: 'Ingrediente',
                                             border: OutlineInputBorder(),
