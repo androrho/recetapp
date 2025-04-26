@@ -30,8 +30,6 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
   final List<ListIngredientItem> _ingredientsList = [];
   final List<ListStepItem> _stepsList = [];
 
-  bool _isLoading = true;
-
   get newId => null;
 
   @override
@@ -72,8 +70,6 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
         stepController: TextEditingController(text: s.text),
       ));
     }
-
-    setState(() => _isLoading = false);
   }
 
   Future<void> _updateFullRecipe() async {
