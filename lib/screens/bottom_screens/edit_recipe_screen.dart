@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recetapp/model/recipe.dart';
 import 'package:recetapp/model/ingredient.dart';
 import 'package:recetapp/model/step.dart' as appStep;
+import 'package:recetapp/screens/bottom_screens/recipie_detail_screen.dart';
 import '../../controller/recipes_service.dart';
 import '../../controller/ingredients_service.dart';
 import '../../controller/steps_service.dart';
@@ -48,6 +50,8 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
   bool _isLoading = true;
 
+  get newId => null;
+
   @override
   void initState() {
     super.initState();
@@ -55,38 +59,36 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
   }
 
   Future<void> _loadRecipie() async {
-    // 1) Carga la receta
-    final recipe = await RecipesService().readById(widget.recipeId);
+    // 1) Carga la receta desde el stream (solo el primer valor)
+    final recipe = await RecipesService()
+        .watchById(widget.recipeId)
+        .first;
 
     // 2) Precarga campos de texto
-    _titleController.text = recipe.title ?? '';
+    _titleController.text       = recipe.title       ?? '';
     _descriptionController.text = recipe.description ?? '';
-    _numberController.text = (recipe.personNumber ?? 0).toString();
+    _numberController.text      = (recipe.personNumber ?? 0).toString();
 
-    // 3) Carga todos los ingredientes y filtra
-    final allIng = await IngredientsService().read();
-    final myIng = allIng.where((i) => i.recipie == widget.recipeId);
-    for (var i in myIng) {
-      _ingredientsList.add(
-        ListIngredientItem(
-          ingredientController: TextEditingController(text: i.name),
-          quantityController: TextEditingController(
-            text: i.quantity?.toString(),
-          ),
-          unitTypeController: TextEditingController(text: i.quantityType),
-        ),
-      );
+    // 3) Carga solo los ingredientes de esta receta
+    final ingredients = await IngredientsService()
+        .watchByRecipe(widget.recipeId)
+        .first;
+    for (var i in ingredients) {
+      _ingredientsList.add(ListIngredientItem(
+        ingredientController: TextEditingController(text: i.name),
+        quantityController:   TextEditingController(text: i.quantity?.toString()),
+        unitTypeController:   TextEditingController(text: i.quantityType),
+      ));
     }
 
-    // 4) Carga todos los pasos y filtra y ordena
-    final allSt = await StepsService().read();
-    final mySt =
-    allSt.where((s) => s.recipie == widget.recipeId).toList()
-      ..sort((a, b) => (a.position ?? 0).compareTo(b.position ?? 0));
-    for (var s in mySt) {
-      _stepsList.add(
-        ListStepItem(stepController: TextEditingController(text: s.text)),
-      );
+    // 4) Carga solo los pasos de esta receta
+    final steps = await StepsService()
+        .watchByRecipe(widget.recipeId)
+        .first;
+    for (var s in steps) {
+      _stepsList.add(ListStepItem(
+        stepController: TextEditingController(text: s.text),
+      ));
     }
 
     setState(() => _isLoading = false);
@@ -95,14 +97,22 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
   Future<void> _updateFullRecipe() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final recipeId = widget.recipeId;
+    final oldRecipeId = widget.recipeId;
 
-    _deleteFullRecipe(recipeId);
+    _deleteFullRecipe(oldRecipeId);
 
-    _saveFullRecipe();
+    final newRecipeId = await _saveFullRecipe();
 
-    Fluttertoast.showToast(msg: 'Receta actualizada correctamente');
+    Fluttertoast.showToast(msg: 'Receta actualizada');
+
     Navigator.pop(context);
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RecipeDetailScreen(recipeId: newRecipeId),
+      ),
+    );
   }
 
   Future<void> _deleteFullRecipe(String recipeId) async {
@@ -114,18 +124,18 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
   Future<void> _deleteIngredients(String recipeId) async {
     final ingSvc = IngredientsService();
-    final allIng = await ingSvc.read();
-    for (final ing in allIng.where((i) => i.recipie == recipeId)) {
-      await ingSvc.delete(ing.id!);
-    }
+    // Obtenemos solo los ingredientes de esta receta
+    final ingredients = await ingSvc.watchByRecipe(recipeId).first;
+    // Borramos todos en paralelo
+    await Future.wait(ingredients.map((i) => ingSvc.delete(i.id!)));
   }
 
   Future<void> _deleteSteps(String recipeId) async {
     final stepSvc = StepsService();
-    final allSteps = await stepSvc.read();
-    for (final st in allSteps.where((s) => s.recipie == recipeId)) {
-      await stepSvc.delete(st.id!);
-    }
+    // Obtenemos solo los pasos de esta receta
+    final steps = await stepSvc.watchByRecipe(recipeId).first;
+    // Borramos todos en paralelo
+    await Future.wait(steps.map((s) => stepSvc.delete(s.id!)));
   }
 
   Future<void> _deleteRecipe(String recipeId) async {
@@ -133,10 +143,13 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     await recipeService.delete(recipeId);
   }
 
-  Future<void> _saveFullRecipe() async {
+  Future<String> _saveFullRecipe() async {
     final String recipeId = await _saveRecipe();
     _saveIngredients(recipeId);
     _saveSteps(recipeId);
+    await FirebaseFirestore.instance.waitForPendingWrites(); //TODO importante
+
+    return recipeId;
   }
 
   Future<String> _saveRecipe() async {

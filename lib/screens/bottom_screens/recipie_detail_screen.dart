@@ -5,7 +5,7 @@ import 'package:recetapp/model/step.dart' as appStep;
 import '../../controller/ingredients_service.dart';
 import '../../controller/steps_service.dart';
 import '../../model/recipe.dart';
-import 'edit_recipie_screen.dart';
+import 'edit_recipe_screen.dart';
 
 class RecipeDetailScreen extends StatelessWidget {
   final String recipeId;
@@ -62,31 +62,23 @@ class RecipeDetailScreen extends StatelessWidget {
                         ),
                   );
 
-                  if (confirm == true) {
-                    final recipeId = this.recipeId;
+                  if (confirm != true) return;
 
-                    // 1. Borrar ingredientes asociados
-                    final ingSvc = IngredientsService();
-                    final allIng = await ingSvc.read();
-                    for (final ing in allIng.where(
-                      (i) => i.recipie == recipeId,
-                    )) {
-                      await ingSvc.delete(ing.id!);
-                    }
-                    // 2. Borrar pasos asociados
-                    final stepSvc = StepsService();
-                    final allSteps = await stepSvc.read();
-                    for (final st in allSteps.where(
-                      (s) => s.recipie == recipeId,
-                    )) {
-                      await stepSvc.delete(st.id!);
-                    }
-                    // 3. Borrar la receta
-                    await RecipesService().delete(recipeId);
+                  // 1) Borrar todos los ingredientes de esta receta
+                  final ingSvc = IngredientsService();
+                  final ingredients = await ingSvc.watchByRecipe(recipeId).first;
+                  await Future.wait(ingredients.map((i) => ingSvc.delete(i.id!)));
 
-                    // Volvemos atrás
-                    Navigator.pop(context);
-                  }
+                  // 2) Borrar todos los pasos de esta receta
+                  final stepSvc = StepsService();
+                  final steps = await stepSvc.watchByRecipe(recipeId).first;
+                  await Future.wait(steps.map((s) => stepSvc.delete(s.id!)));
+
+                  // 3) Borrar la propia receta
+                  await RecipesService().delete(recipeId);
+
+                  // 4) Volver atrás (cierra detalle)
+                  Navigator.pop(context);
                   break;
               }
             },
@@ -107,90 +99,111 @@ class RecipeDetailScreen extends StatelessWidget {
                 horizontal: horizontalPadding,
                 vertical: 16,
               ),
-              child: FutureBuilder<List<dynamic>>(
-                future: Future.wait([
-                  RecipesService().readById(
-                    recipeId,
-                  ), // :contentReference[oaicite:0]{index=0}&#8203;:contentReference[oaicite:1]{index=1}
-                  IngredientsService()
-                      .read(), // :contentReference[oaicite:2]{index=2}&#8203;:contentReference[oaicite:3]{index=3}
-                  StepsService().read(), // asume StepsService.read() análogo
-                ]),
-                builder: (context, snap) {
-                  if (snap.connectionState != ConnectionState.done) {
+              child: StreamBuilder<Recipe>(
+                stream: RecipesService().watchById(recipeId),
+                builder: (ctxRec, snapRec) {
+                  if (snapRec.connectionState != ConnectionState.active) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  if (snap.hasError) {
-                    return Center(child: Text('Error: ${snap.error}'));
+                  if (snapRec.hasError) {
+                    return Center(
+                      child: Text('Error receta: ${snapRec.error}'),
+                    );
                   }
+                  final recipe = snapRec.data!;
 
-                  final Recipe recipe = snap.data![0] as Recipe;
-                  final allIng = snap.data![1] as List<Ingredient>;
-                  final allSteps = snap.data![2] as List<appStep.Step>;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Título
+                      Text(
+                        recipe.title ?? '',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 12),
 
-                  // Filtrar sólo los de esta receta
-                  final ingredients =
-                      allIng.where((i) => i.recipie == recipeId).toList();
-                  final steps =
-                      allSteps.where((s) => s.recipie == recipeId).toList()
-                        ..sort(
-                          (a, b) =>
-                              (a.position ?? 0).compareTo(b.position ?? 0),
-                        );
+                      // Descripción
+                      Text(
+                        recipe.description ?? '',
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      const SizedBox(height: 24),
 
-                  return SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // TÍTULO (más grande)
-                        Text(
-                          recipe.title ?? '',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        const SizedBox(height: 12),
+                      // 2) INGREDIENTES
+                      Text(
+                        'Ingredientes',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      StreamBuilder<List<Ingredient>>(
+                        stream: IngredientsService().watchByRecipe(recipeId),
+                        builder: (ctxIng, snapIng) {
+                          if (snapIng.connectionState !=
+                              ConnectionState.active) {
+                            return const SizedBox();
+                          }
+                          if (snapIng.hasError) {
+                            return Text('Error ingredientes: ${snapIng.error}');
+                          }
+                          final ingredients = snapIng.data!;
 
-                        // DESCRIPCIÓN
-                        Text(
-                          recipe.description ?? '',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        const SizedBox(height: 24),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:
+                                ingredients.map((i) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    child: Text(
+                                      '• ${i.name} — ${i.quantity} ${i.quantityType}',
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                    ),
+                                  );
+                                }).toList(),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 24),
 
-                        // INGREDIENTES
-                        Text(
-                          'Ingredientes',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        ...ingredients.map(
-                          (ing) => Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Text(
-                              '• ${ing.name} - ${ing.quantity ?? 0} ${ing.quantityType}',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                        ),
+                      // 3) PASOS
+                      Text(
+                        'Pasos',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      StreamBuilder<List<appStep.Step>>(
+                        stream: StepsService().watchByRecipe(recipeId),
+                        builder: (ctxSt, snapSt) {
+                          if (snapSt.connectionState !=
+                              ConnectionState.active) {
+                            return const SizedBox();
+                          }
+                          if (snapSt.hasError) {
+                            return Text('Error pasos: ${snapSt.error}');
+                          }
+                          final steps = snapSt.data!;
 
-                        const SizedBox(height: 24),
-
-                        // PASOS
-                        Text(
-                          'Pasos',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        ...steps.map(
-                          (st) => Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Text(
-                              '${st.position}. ${st.text}',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:
+                                steps.map((s) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 6),
+                                    child: Text(
+                                      '${s.position}. ${s.text}',
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                    ),
+                                  );
+                                }).toList(),
+                          );
+                        },
+                      ),
+                    ],
                   );
                 },
               ),

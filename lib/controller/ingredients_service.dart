@@ -13,6 +13,42 @@ class IngredientsService {
     await docRef.set(newObject.toJson());
   }
 
+  Stream<List<Ingredient>> watchAll() {
+    return _db
+        .collection(_collection)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) {
+      final data = doc.data()..['id'] = doc.id;
+      return Ingredient.fromJson(data);
+    }).toList());
+  }
+
+  /// Emite en tiempo real un único ingrediente por su id.
+  Stream<Ingredient> watchById(String id) {
+    return _db
+        .collection(_collection)
+        .doc(id)
+        .snapshots()
+        .map((docSnap) {
+      final data = docSnap.data()!..['id'] = docSnap.id;
+      return Ingredient.fromJson(data);
+    });
+  }
+
+  /// Emite en tiempo real los ingredientes de una receta concreta,
+  /// filtrando por el campo `recipie`.
+  Stream<List<Ingredient>> watchByRecipe(String recipeId) {
+    return _db
+        .collection(_collection)
+        .where('recipie', isEqualTo: recipeId)
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) {
+      final data = doc.data()..['id'] = doc.id;
+      return Ingredient.fromJson(data);
+    }).toList());
+  }
+
+  @deprecated
   Future<List<Ingredient>> read() async {
     final snapshot = await _db.collection(_collection).get();
     return snapshot.docs.map((doc) {
@@ -22,6 +58,7 @@ class IngredientsService {
     }).toList();
   }
 
+  @deprecated
   Future<Ingredient?> readById(String id) async {
     final doc = await _db.collection(_collection).doc(id).get();
     if (doc.exists) {

@@ -13,6 +13,29 @@ class UserService {
     await docRef.set(newObject.toJson());
   }
 
+  Stream<List<User>> watchAll() {
+    return _db.collection(_collection).snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return User.fromJson(data);
+      }).toList();
+    });
+  }
+
+  Stream<User> watchById(String id) {
+    return _db.collection(_collection).doc(id).snapshots().map((docSnap) {
+      if (docSnap.exists) {
+        final data = docSnap.data()!;
+        data['id'] = docSnap.id;
+        return User.fromJson(data);
+      }
+      // Si no existe, devolvemos un placeholder
+      return User(id: id, displayName: "n/a", login: "", password: "");
+    });
+  }
+
+  @deprecated
   Future<List<User>> read() async {
     final snapshot = await _db.collection(_collection).get();
     return snapshot.docs.map((doc) {
@@ -22,6 +45,7 @@ class UserService {
     }).toList();
   }
 
+  @deprecated
   Future<User?> readById(String id) async {
     final doc = await _db.collection(_collection).doc(id).get();
     if (doc.exists) {

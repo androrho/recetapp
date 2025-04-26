@@ -14,6 +14,42 @@ class RecipesService {
     return docRef.id;
   }
 
+  Stream<List<Recipe>> watchAll() {
+    return _db
+        .collection(_collection)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return Recipe.fromJson(data);
+      }).toList();
+    });
+  }
+
+  Stream<Recipe> watchById(String id) {
+    return _db
+        .collection(_collection)
+        .doc(id)
+        .snapshots()
+        .map((docSnap) {
+      if (docSnap.exists) {
+        final data = docSnap.data()!;
+        data['id'] = docSnap.id;
+        return Recipe.fromJson(data);
+      }
+      // Si no existe, devolvemos un placeholder
+      return Recipe(
+        id: id,
+        title: '',
+        description: '',
+        personNumber: 0,
+        user: '',
+      );
+    });
+  }
+
+  @deprecated
   Future<List<Recipe>> read() async {
     final snapshot = await _db.collection(_collection).get();
     return snapshot.docs.map((doc) {
@@ -23,6 +59,7 @@ class RecipesService {
     }).toList();
   }
 
+  @deprecated
   Future<Recipe> readById(String id) async {
     final doc = await _db.collection(_collection).doc(id).get();
     if (doc.exists) {

@@ -12,7 +12,44 @@ class StepsService {
     final newObject = object.copyWith(id: docRef.id);
     await docRef.set(newObject.toJson());
   }
+  Stream<List<Step>> watchAll() {
+    return _db
+        .collection(_collection)
+        .orderBy('position')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) {
+      final data = doc.data()..['id'] = doc.id;
+      return Step.fromJson(data);
+    }).toList());
+  }
 
+  /// Emite en tiempo real un único paso por su id.
+  Stream<Step> watchById(String id) {
+    return _db
+        .collection(_collection)
+        .doc(id)
+        .snapshots()
+        .map((docSnap) {
+      final data = docSnap.data()!..['id'] = docSnap.id;
+      return Step.fromJson(data);
+    });
+  }
+
+  /// Emite en tiempo real sólo los pasos asociados a una receta,
+  /// filtrando por el campo `recipie` y ordenando por `position`.
+  Stream<List<Step>> watchByRecipe(String recipeId) {
+    return _db
+        .collection(_collection)
+        .where('recipie', isEqualTo: recipeId)
+        .orderBy('position')
+        .snapshots()
+        .map((snap) => snap.docs.map((doc) {
+      final data = doc.data()..['id'] = doc.id;
+      return Step.fromJson(data);
+    }).toList());
+  }
+
+  @deprecated
   Future<List<Step>> read() async {
     final snapshot = await _db.collection(_collection).get();
     return snapshot.docs.map((doc) {
@@ -22,6 +59,7 @@ class StepsService {
     }).toList();
   }
 
+  @deprecated
   Future<Step> readById(String id) async {
     final doc = await _db.collection(_collection).doc(id).get();
     if (doc.exists) {
