@@ -47,38 +47,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   Future<void> _saveFullRecipe() async {
     if (!_formKey.currentState!.validate()) return;
 
-    int personNumber = int.tryParse(_numberController.text) ?? 0;
-    final newRecipe = Recipe(
-      title: _titleController.text,
-      description: _descriptionController.text,
-      personNumber: personNumber,
-      user: "0", // TODO: Asignar el id real del usuario
-    );
-
-    final String recipeId = await RecipesService().create(newRecipe);
-
-    // Guardamos cada ingrediente asociado a la receta
-    for (final ingredient in _ingredientsList) {
-      final double quantity =
-          double.tryParse(ingredient.quantityController.text) ?? 0.0;
-      final ingredientObject = Ingredient(
-        name: ingredient.ingredientController.text,
-        quantity: quantity,
-        quantityType: ingredient.unitTypeController.text,
-        recipie: recipeId,
-      );
-      await IngredientsService().create(ingredientObject);
-    }
-
-    // Guardamos cada paso asociado, asignando la posición de forma incremental
-    for (int i = 0; i < _stepsList.length; i++) {
-      final stepObject = app_step.Step(
-        position: i + 1,
-        recipie: recipeId,
-        text: _stepsList[i].stepController.text,
-      );
-      await StepsService().create(stepObject);
-    }
+    final String recipeId = await _saveRecipe();
+    _saveIngredients(recipeId);
+    _saveSteps(recipeId);
 
     Navigator.pop(context);
 
@@ -90,6 +61,43 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
       backgroundColor: Colors.black,
       textColor: Colors.white,
     );
+  }
+
+  Future<String> _saveRecipe() async {
+    int personNumber = int.tryParse(_numberController.text) ?? 0;
+    final newRecipe = Recipe(
+      title: _titleController.text,
+      description: _descriptionController.text,
+      personNumber: personNumber,
+      user: "0", // TODO: Asignar el id real del usuario
+    );
+
+    return await RecipesService().create(newRecipe);
+  }
+
+  Future<void> _saveIngredients(String recipeId) async {
+    for (final ingredient in _ingredientsList) {
+      final double quantity =
+          double.tryParse(ingredient.quantityController.text) ?? 0.0;
+      final ingredientObject = Ingredient(
+        name: ingredient.ingredientController.text,
+        quantity: quantity,
+        quantityType: ingredient.unitTypeController.text,
+        recipie: recipeId,
+      );
+      await IngredientsService().create(ingredientObject);
+    }
+  }
+
+  Future<void> _saveSteps(String recipeId) async {
+    for (int i = 0; i < _stepsList.length; i++) {
+      final stepObject = app_step.Step(
+        position: i + 1,
+        recipie: recipeId,
+        text: _stepsList[i].stepController.text,
+      );
+      await StepsService().create(stepObject);
+    }
   }
 
   void _addIngredient() {
