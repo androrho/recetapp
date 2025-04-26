@@ -8,26 +8,8 @@ import 'package:recetapp/screens/bottom_screens/recipie_detail_screen.dart';
 import '../../controller/recipes_service.dart';
 import '../../controller/ingredients_service.dart';
 import '../../controller/steps_service.dart';
-
-/// Auxiliar para ingredientes pre-cargados
-class ListIngredientItem {
-  final TextEditingController ingredientController;
-  final TextEditingController quantityController;
-  final TextEditingController unitTypeController;
-
-  ListIngredientItem({
-    required this.ingredientController,
-    required this.quantityController,
-    required this.unitTypeController,
-  });
-}
-
-/// Auxiliar para pasos pre-cargados
-class ListStepItem {
-  final TextEditingController stepController;
-
-  ListStepItem({required this.stepController});
-}
+import '../../widgets/form_items/list_ingredient_item.dart';
+import '../../widgets/form_items/list_step_item.dart';
 
 class EditRecipieScreen extends StatefulWidget {
   final String recipeId;
