@@ -30,8 +30,12 @@ class UserService {
         data['id'] = docSnap.id;
         return User.fromJson(data);
       }
-      // Si no existe, devolvemos un placeholder
-      return User(id: id, displayName: "n/a", login: "", password: "");
+      return User(
+          id: id,
+          displayName: "n/a",
+          login: "",
+          password: ""
+      );
     });
   }
 
