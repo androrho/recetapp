@@ -4,7 +4,7 @@ import 'package:recetapp/model/recipe.dart';
 
 class RecipesService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final String _collection = 'recipies';
+  final String _collection = 'recipes';
 
   Future<String> create(Recipe object) async {
     final collection = FirebaseFirestore.instance.collection(_collection);
@@ -38,7 +38,6 @@ class RecipesService {
         data['id'] = docSnap.id;
         return Recipe.fromJson(data);
       }
-      // Si no existe, devolvemos un placeholder
       return Recipe(
         id: id,
         title: '',
