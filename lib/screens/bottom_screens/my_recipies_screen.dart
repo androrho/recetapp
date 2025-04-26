@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:recetapp/model/recipe.dart';
-import 'package:recetapp/screens/bottom_screens/recipie_detail_screen.dart';
+import 'package:recetapp/screens/recipie_detail_screen.dart';
 import '../../controller/recipes_service.dart';
-import 'add_recipe_screen.dart';
+import '../add_recipe_screen.dart';
 
 class MyRecipiesScreen extends StatelessWidget {
   const MyRecipiesScreen({Key? key}) : super(key: key);

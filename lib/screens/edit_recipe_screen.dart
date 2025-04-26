@@ -4,12 +4,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recetapp/model/recipe.dart';
 import 'package:recetapp/model/ingredient.dart';
 import 'package:recetapp/model/step.dart' as app_step;
-import 'package:recetapp/screens/bottom_screens/recipie_detail_screen.dart';
-import '../../controller/recipes_service.dart';
-import '../../controller/ingredients_service.dart';
-import '../../controller/steps_service.dart';
-import '../../widgets/form_items/list_ingredient_item.dart';
-import '../../widgets/form_items/list_step_item.dart';
+import 'package:recetapp/screens/recipie_detail_screen.dart';
+import '../controller/recipes_service.dart';
+import '../controller/ingredients_service.dart';
+import '../controller/steps_service.dart';
+import '../widgets/form_items/list_ingredient_item.dart';
+import '../widgets/form_items/list_step_item.dart';
 
 class EditRecipieScreen extends StatefulWidget {
   final String recipeId;
