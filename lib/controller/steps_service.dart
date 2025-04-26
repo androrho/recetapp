@@ -23,7 +23,6 @@ class StepsService {
     }).toList());
   }
 
-  /// Emite en tiempo real un único paso por su id.
   Stream<Step> watchById(String id) {
     return _db
         .collection(_collection)
@@ -35,12 +34,10 @@ class StepsService {
     });
   }
 
-  /// Emite en tiempo real sólo los pasos asociados a una receta,
-  /// filtrando por el campo `recipie` y ordenando por `position`.
   Stream<List<Step>> watchByRecipe(String recipeId) {
     return _db
         .collection(_collection)
-        .where('recipie', isEqualTo: recipeId)
+        .where('recipe', isEqualTo: recipeId)
         .orderBy('position')
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
