@@ -23,7 +23,6 @@ class IngredientsService {
     }).toList());
   }
 
-  /// Emite en tiempo real un único ingrediente por su id.
   Stream<Ingredient> watchById(String id) {
     return _db
         .collection(_collection)
@@ -35,8 +34,6 @@ class IngredientsService {
     });
   }
 
-  /// Emite en tiempo real los ingredientes de una receta concreta,
-  /// filtrando por el campo `recipie`.
   Stream<List<Ingredient>> watchByRecipe(String recipeId) {
     return _db
         .collection(_collection)
