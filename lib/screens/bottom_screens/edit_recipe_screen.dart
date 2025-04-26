@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recetapp/model/recipe.dart';
 import 'package:recetapp/model/ingredient.dart';
-import 'package:recetapp/model/step.dart' as appStep;
+import 'package:recetapp/model/step.dart' as app_step;
 import 'package:recetapp/screens/bottom_screens/recipie_detail_screen.dart';
 import '../../controller/recipes_service.dart';
 import '../../controller/ingredients_service.dart';
@@ -164,7 +164,7 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
   Future<void> _saveSteps(String recipeId) async {
     for (int i = 0; i < _stepsList.length; i++) {
-      final stepObject = appStep.Step(
+      final stepObject = app_step.Step(
         position: i + 1,
         recipie: recipeId,
         text: _stepsList[i].stepController.text,
