@@ -7,7 +7,6 @@ class CommunityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Mismo cálculo de padding horizontal que en AddRecipieScreen
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
@@ -17,8 +16,8 @@ class CommunityScreen extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-        child: FutureBuilder<List<Recipe>>(
-          future: service.read(),
+        child: StreamBuilder<List<Recipe>>(
+          stream: service.watchAll(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -26,7 +25,7 @@ class CommunityScreen extends StatelessWidget {
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
-            final recipes = snapshot.data!;
+            final recipes = snapshot.data ?? [];
             if (recipes.isEmpty) {
               return const Center(child: Text('No hay recetas disponibles'));
             }
@@ -51,25 +50,22 @@ class CommunityScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Título de la receta
                           Text(
                             r.title ?? '',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 8),
-                          // Descripción y número de personas con icono
                           Row(
                             children: [
-                              // Descripción (mayor flex)
                               Expanded(
                                 flex: 3,
                                 child: Text(
                                   r.description ?? '',
-                                  style: Theme.of(context).textTheme.bodyMedium,
+                                  style:
+                                  Theme.of(context).textTheme.bodyMedium,
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              // Número de personas + icono de grupo
                               Expanded(
                                 flex: 1,
                                 child: Row(
@@ -77,7 +73,9 @@ class CommunityScreen extends StatelessWidget {
                                   children: [
                                     Text(
                                       '${r.personNumber ?? 0}',
-                                      style: Theme.of(context).textTheme.bodyMedium,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
                                     ),
                                     const SizedBox(width: 4),
                                     Icon(
