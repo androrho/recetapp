@@ -12,7 +12,6 @@ class MyRecipiesScreen extends StatelessWidget {
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
-    final service = RecipesService();
 
     return Scaffold(
       body: Center(
