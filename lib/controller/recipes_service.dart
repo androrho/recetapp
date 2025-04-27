@@ -27,6 +27,20 @@ class RecipesService {
     });
   }
 
+  Stream<List<Recipe>> watchByUser(String userId) {
+    return _db
+        .collection(_collection)
+        .where('user', isEqualTo: userId)       // Filtramos por campo `user`
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return Recipe.fromJson(data);
+      }).toList();
+    });
+  }
+
   Stream<Recipe> watchById(String id) {
     return _db
         .collection(_collection)
