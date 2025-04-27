@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import '../controller/auth_service.dart';
 import 'main_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,28 +15,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _loginWithGoogle() async {
     setState(() => _isLoading = true);
     try {
-      // 1. Inicia flujo de Google Sign-In
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        // El usuario canceló
-        return;
+      final user = await AuthService().signInWithGoogle();
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainHomeScreen()),
+        );
       }
-
-      // 2. Obtiene credenciales de autenticación
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken:     googleAuth.idToken,
-      );
-
-      // 3. Autentica en Firebase
-      await FirebaseAuth.instance.signInWithCredential(credential);
-
-      // 4. Navega a la pantalla principal
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const MainHomeScreen()),
-      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error de Firebase: ${e.message}')),
