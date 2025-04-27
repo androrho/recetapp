@@ -64,7 +64,7 @@ class StepsService {
       data['id'] = doc.id;
       return Step.fromJson(data);
     }
-    return Step(id: "0", position: 0, recipie: "0", text: "n/a");
+    return Step(id: "0", position: 0, recipe: "0", text: "n/a");
   }
 
   Future<void> update(String id, Step object) async {

@@ -162,7 +162,7 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     for (int i = 0; i < _stepsList.length; i++) {
       final stepObject = app_step.Step(
         position: i + 1,
-        recipie: recipeId,
+        recipe: recipeId,
         text: _stepsList[i].stepController.text,
       );
       await StepsService().create(stepObject);

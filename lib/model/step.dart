@@ -6,13 +6,13 @@ part 'step.g.dart';
 class Step {
   final String? id;
   int? position;
-  String? recipie;
+  String? recipe;
   String? text;
 
   Step({
     this.id,
     required this.position,
-    required this.recipie,
+    required this.recipe,
     required this.text,
   });
 
@@ -25,7 +25,7 @@ class Step {
     return Step(
       id: id ?? this.id,
       position: position ?? this.position,
-      recipie: recipie ?? this.recipie,
+      recipe: recipie ?? this.recipe,
       text: text ?? this.text,
     );
   }
