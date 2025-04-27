@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:recetapp/screens/recipie_detail_screen.dart';
+import 'package:recetapp/screens/recipie_detail.dart';
 import '../controller/recipes_service.dart';
 import '../model/ingredient.dart';
 import 'package:recetapp/model/step.dart' as appStep;
