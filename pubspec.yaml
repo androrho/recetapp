@@ -39,6 +39,8 @@ dependencies:
   cloud_firestore: ^5.6.5
   json_annotation: ^4.9.0
   fluttertoast: ^8.2.1
+  firebase_auth: 5.5.2
+  google_sign_in: ^6.1.4
 
 dev_dependencies:
   flutter_test:
@@ -74,7 +76,8 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
-
+  assets:
+    - assets/google_logo.png
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

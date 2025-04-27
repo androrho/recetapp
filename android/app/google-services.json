@@ -12,7 +12,20 @@
           "package_name": "com.aob.recetapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "731614538303-5ru7bvgfku6au068dfe14ppg13e49cqk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aob.recetapp",
+            "certificate_hash": "1b9be5f397cff5217b6f7258441807d9a113846a"
+          }
+        },
+        {
+          "client_id": "731614538303-k8f551tomp1jsou42ku6io4884dpgap7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAz_HxrhiFCzHchyydCGTj0L7B9YTZcY_Y"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "731614538303-k8f551tomp1jsou42ku6io4884dpgap7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "731614538303-oojl0kjl6jknrrtnsf5dcv7gbkmk6s1g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.aob.recetapp"
+              }
+            }
+          ]
         }
       }
     }

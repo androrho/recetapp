@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:recetapp/firebase_options.dart';
+import 'package:recetapp/screens/login_screen.dart';
 
 import 'screens/main_home_screen.dart';
 
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           themeMode: ThemeMode.system,
-          home: const MainHomeScreen(),
+          home: const LoginScreen(),
         );
       },
     );
