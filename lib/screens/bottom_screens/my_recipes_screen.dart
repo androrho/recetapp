@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:recetapp/model/recipe.dart';
+import 'package:recetapp/screens/detail_my_recipes_screen.dart';
 import '../../controller/auth_service.dart';
 import '../../controller/recipes_service.dart';
 import '../add_recipe_screen.dart';
-import '../recipie_detail_screen.dart';
 
 class MyRecipesScreen extends StatelessWidget {
   const MyRecipesScreen({Key? key}) : super(key: key);
@@ -55,7 +55,7 @@ class MyRecipesScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => RecipeDetailScreen(
+                                builder: (_) => DetailMyRecipesScreen(
                                     recipeId: r.id!),
                               ),
                             );
