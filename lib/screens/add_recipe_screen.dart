@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recetapp/model/recipe.dart';
+import '../controller/auth_service.dart';
 import '../controller/ingredients_service.dart';
 import '../controller/recipes_service.dart';
 import '../controller/steps_service.dart';
@@ -64,12 +65,13 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   }
 
   Future<String> _saveRecipe() async {
+    final String? userId = AuthService().currentUserId;
     int personNumber = int.tryParse(_numberController.text) ?? 0;
     final newRecipe = Recipe(
       title: _titleController.text,
       description: _descriptionController.text,
       personNumber: personNumber,
-      user: "0", // TODO: Asignar el id real del usuario
+      user: userId,
     );
 
     return await RecipesService().create(newRecipe);

@@ -5,6 +5,7 @@ import 'package:recetapp/model/recipe.dart';
 import 'package:recetapp/model/ingredient.dart';
 import 'package:recetapp/model/step.dart' as app_step;
 import 'package:recetapp/screens/recipie_detail_screen.dart';
+import '../controller/auth_service.dart';
 import '../controller/recipes_service.dart';
 import '../controller/ingredients_service.dart';
 import '../controller/steps_service.dart';
@@ -131,17 +132,16 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
   }
 
   Future<String> _saveRecipe() async {
+    final String? userId = AuthService().currentUserId;
     int personNumber = int.tryParse(_numberController.text) ?? 0;
-    final newRecipie = Recipe(
+    final newRecipe = Recipe(
       title: _titleController.text,
       description: _descriptionController.text,
       personNumber: personNumber,
-      user: "0", // TODO: Asignar el id real del usuario
+      user: userId,
     );
 
-    final String recipeId = await RecipesService().create(newRecipie);
-
-    return recipeId;
+    return await RecipesService().create(newRecipe);
   }
 
   Future<void> _saveIngredients(String recipeId) async {
