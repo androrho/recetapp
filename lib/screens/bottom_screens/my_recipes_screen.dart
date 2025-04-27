@@ -4,8 +4,8 @@ import 'package:recetapp/screens/recipie_detail_screen.dart';
 import '../../controller/recipes_service.dart';
 import '../add_recipe_screen.dart';
 
-class MyRecipiesScreen extends StatelessWidget {
-  const MyRecipiesScreen({Key? key}) : super(key: key);
+class MyRecipesScreen extends StatelessWidget {
+  const MyRecipesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
