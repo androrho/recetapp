@@ -350,7 +350,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                                                 value.isEmpty) {
                                               return 'Ingrese un número';
                                             }
-                                            if (int.tryParse(value) == null) {
+                                            if (double.tryParse(value) == null) {
                                               return 'Ingrese un número válido';
                                             }
                                             return null;
