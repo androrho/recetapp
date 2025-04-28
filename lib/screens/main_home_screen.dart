@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'bottom_screens/my_recipes_screen.dart';
 import 'bottom_screens/community_screen.dart';
 import 'bottom_screens/my_account_screen.dart';
+import 'bottom_screens/my_recipes_screen.dart';
 
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({super.key});
