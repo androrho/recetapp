@@ -1,5 +1,7 @@
+
+
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../controller/auth_service.dart';
 import '../../controller/recipes_service.dart';
 
@@ -92,7 +94,7 @@ class MyAccountScreen extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
 
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService().currentUser;
     final photoUrl = user?.photoURL;
     final name = user?.displayName ?? 'Usuario';
     final email = user?.email ?? '';
