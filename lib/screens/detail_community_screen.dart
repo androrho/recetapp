@@ -19,9 +19,7 @@ class DetailCommunityScreen extends StatelessWidget {
   Future<void> _copyRecipe(BuildContext context, Recipe recipe) async {
     final currentUserId = AuthService().currentUserId;
     if (currentUserId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debes iniciar sesión para guardar')),
-      );
+      Fluttertoast.showToast(msg: 'Debes iniciar sesión para guardar');
       return;
     }
     try {
