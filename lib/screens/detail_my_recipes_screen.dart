@@ -14,9 +14,6 @@ class DetailMyRecipesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-    final double horizontalPadding = isLandscape ? 50.0 : 45.0;
 
     return Scaffold(
       appBar: AppBar(
