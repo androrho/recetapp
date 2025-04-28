@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:recetapp/screens/recipie_detail.dart';
-import '../controller/recipes_service.dart';
-import '../model/ingredient.dart';
-import 'package:recetapp/model/step.dart' as appStep;
+
 import '../controller/ingredients_service.dart';
+import '../controller/recipes_service.dart';
 import '../controller/steps_service.dart';
-import '../model/recipe.dart';
 import 'edit_recipe_screen.dart';
 
 class DetailMyRecipesScreen extends StatelessWidget {
