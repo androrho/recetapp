@@ -98,42 +98,47 @@ class MyAccountScreen extends StatelessWidget {
     final email = user?.email ?? '';
 
     return Scaffold(
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 450),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Foto de perfil
-                if (photoUrl != null) ...[
-                  CircleAvatar(
-                    radius: 48,
-                    backgroundImage: NetworkImage(photoUrl),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: 16,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 450),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (photoUrl != null) ...[
+                    CircleAvatar(
+                      radius: 48,
+                      backgroundImage: NetworkImage(photoUrl),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                  Text(
+                    name,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  const SizedBox(height: 16),
-                ],
-                Text(name, style: Theme.of(context).textTheme.headlineSmall),
-                const SizedBox(height: 8),
-                Text(email, style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 32),
+                  const SizedBox(height: 8),
+                  Text(
+                    email,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 32),
 
-                // Cerrar sesión
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
+                  // Cerrar sesión
+                  ElevatedButton(
                     onPressed: () => _confirmSignOut(context),
                     child: const Text('Cerrar sesión'),
                   ),
-                ),
+                  const SizedBox(height: 16),
 
-                const SizedBox(height: 16),
-
-                // Borrar recetas
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
+                  // Borrar recetas
+                  ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
@@ -141,12 +146,12 @@ class MyAccountScreen extends StatelessWidget {
                     onPressed: () => _confirmDeleteAllRecipes(context),
                     child: const Text('Borrar todas mis recetas'),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      )
+      ),
     );
   }
 }
