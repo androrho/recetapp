@@ -88,54 +88,65 @@ class MyAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+    final double horizontalPadding = isLandscape ? 50.0 : 45.0;
+
     final user = FirebaseAuth.instance.currentUser;
     final photoUrl = user?.photoURL;
     final name = user?.displayName ?? 'Usuario';
     final email = user?.email ?? '';
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Foto de perfil
-          if (photoUrl != null) ...[
-            CircleAvatar(
-              radius: 48,
-              backgroundImage: NetworkImage(photoUrl),
-            ),
-            const SizedBox(height: 16),
-          ],
-          Text(name, style: Theme.of(context).textTheme.headlineSmall),
-          const SizedBox(height: 8),
-          Text(email, style: Theme.of(context).textTheme.bodyMedium),
-          const SizedBox(height: 32),
+    return Scaffold(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 450),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Foto de perfil
+                if (photoUrl != null) ...[
+                  CircleAvatar(
+                    radius: 48,
+                    backgroundImage: NetworkImage(photoUrl),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+                Text(name, style: Theme.of(context).textTheme.headlineSmall),
+                const SizedBox(height: 8),
+                Text(email, style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 32),
 
-          // Cerrar sesión
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () => _confirmSignOut(context),
-              child: const Text('Cerrar sesión'),
+                // Cerrar sesión
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _confirmSignOut(context),
+                    child: const Text('Cerrar sesión'),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Borrar recetas
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () => _confirmDeleteAllRecipes(context),
+                    child: const Text('Borrar todas mis recetas'),
+                  ),
+                ),
+              ],
             ),
           ),
-
-          const SizedBox(height: 16),
-
-          // Borrar recetas
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () => _confirmDeleteAllRecipes(context),
-              child: const Text('Borrar todas mis recetas'),
-            ),
-          ),
-        ],
-      ),
+        ),
+      )
     );
   }
 }
