@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:recetapp/model/ingredient.dart';
+import '../model/ingredient.dart';
 
 class IngredientsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
