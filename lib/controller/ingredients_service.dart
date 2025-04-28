@@ -37,7 +37,7 @@ class IngredientsService {
   Stream<List<Ingredient>> watchByRecipe(String recipeId) {
     return _db
         .collection(_collection)
-        .where('recipie', isEqualTo: recipeId)
+        .where('recipe', isEqualTo: recipeId)
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
       final data = doc.data()..['id'] = doc.id;
@@ -68,7 +68,7 @@ class IngredientsService {
       name: "n/a",
       quantity: 0,
       quantityType: "n/a",
-      recipie: "0",
+      recipe: "0",
     );
   }
 

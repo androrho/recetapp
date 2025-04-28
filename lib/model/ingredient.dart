@@ -8,14 +8,14 @@ class Ingredient {
   String? name;
   double? quantity;
   String? quantityType;
-  String? recipie;
+  String? recipe;
 
   Ingredient({
     this.id,
     required this.name,
     required this.quantity,
     required this.quantityType,
-    required this.recipie,
+    required this.recipe,
   });
 
   Ingredient copyWith({
@@ -23,14 +23,14 @@ class Ingredient {
     String? name,
     double? quantity,
     String? quantityType,
-    String? recipie,
+    String? recipe,
   }) {
     return Ingredient(
       id: id ?? this.id,
       name: name ?? this.name,
       quantity: quantity ?? this.quantity,
       quantityType: quantityType ?? this.quantityType,
-      recipie: recipie ?? this.recipie,
+      recipe: recipe ?? this.recipe,
     );
   }
 
