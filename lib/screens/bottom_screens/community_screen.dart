@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:recetapp/model/recipe.dart';
-import 'package:recetapp/screens/detail_community_screen.dart';
+
 import '../../controller/recipes_service.dart';
+import '../../model/recipe.dart';
+import '../detail_community_screen.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({Key? key}) : super(key: key);
