@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:recetapp/model/step.dart';
+import '../model/step.dart';
 
 class StepsService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
