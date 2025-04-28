@@ -42,7 +42,7 @@ class DetailCommunityScreen extends StatelessWidget {
             name: i.name,
             quantity: i.quantity,
             quantityType: i.quantityType,
-            recipie: newRecipeId,
+            recipe: newRecipeId,
           ),
         );
       }

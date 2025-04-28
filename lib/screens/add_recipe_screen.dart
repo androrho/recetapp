@@ -78,7 +78,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
         name: ingredient.ingredientController.text,
         quantity: quantity,
         quantityType: ingredient.unitTypeController.text,
-        recipie: recipeId,
+        recipe: recipeId,
       );
       await IngredientsService().create(ingredientObject);
     }
