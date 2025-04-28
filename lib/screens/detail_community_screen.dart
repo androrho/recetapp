@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recetapp/screens/recipie_detail.dart';
 
 import '../controller/auth_service.dart';
@@ -61,13 +62,9 @@ class DetailCommunityScreen extends StatelessWidget {
         );
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Receta guardada en Mis Recetas')),
-      );
+      Fluttertoast.showToast(msg: "Receta guardada en Mis Recetas");
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar: $e')),
-      );
+      Fluttertoast.showToast(msg: 'Error al guardar: $e');
     }
   }
 
