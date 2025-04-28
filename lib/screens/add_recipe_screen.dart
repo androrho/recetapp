@@ -54,14 +54,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
     Navigator.pop(context);
 
-    Fluttertoast.showToast(
-      msg: "Receta añadida",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 2,
-      backgroundColor: Colors.black,
-      textColor: Colors.white,
-    );
+    Fluttertoast.showToast(msg: "Receta añadida");
   }
 
   Future<String> _saveRecipe() async {
@@ -350,7 +343,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                                                 value.isEmpty) {
                                               return 'Ingrese un número';
                                             }
-                                            if (double.tryParse(value) == null) {
+                                            if (double.tryParse(value) ==
+                                                null) {
                                               return 'Ingrese un número válido';
                                             }
                                             return null;
