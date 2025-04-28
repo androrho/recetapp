@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:recetapp/model/recipe.dart';
-import 'package:recetapp/screens/detail_my_recipes_screen.dart';
+
 import '../../controller/auth_service.dart';
 import '../../controller/recipes_service.dart';
+import '../../model/recipe.dart';
 import '../add_recipe_screen.dart';
+import '../detail_my_recipes_screen.dart';
 
 class MyRecipesScreen extends StatefulWidget {
   const MyRecipesScreen({Key? key}) : super(key: key);
