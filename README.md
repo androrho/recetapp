@@ -1,6 +1,6 @@
 # recetapp
 
-A recipies app.
+A recipes management app.
 
 ## Getting Started
 
