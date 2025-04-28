@@ -19,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final user = await AuthService().signInWithGoogle();
       if (user != null) {
+        Fluttertoast.showToast(msg: 'Sesión iniciada');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const MainHomeScreen()),
