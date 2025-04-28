@@ -27,9 +27,9 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text('Error de Firebase: ${e.message}')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al autenticar: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al autenticar: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -68,13 +68,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 24,
                     width: 24,
                   ),
-                  label: _isLoading
-                      ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                      : const Text('Iniciar sesión con Google'),
+                  label:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Text('Iniciar sesión con Google'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(48),
                     padding: const EdgeInsets.symmetric(vertical: 12),
