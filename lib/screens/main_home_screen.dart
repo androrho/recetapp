@@ -30,7 +30,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recetop'),
+        title: const Text('Recetapp'),
       ),
       body: widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: NavigationBar(
