@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:recetapp/model/photo.dart';
+import '../model/photo.dart';
 
 class PhotosService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
