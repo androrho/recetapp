@@ -44,7 +44,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
             child: Column(
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 // Campo de búsqueda
                 TextField(
                   controller: _searchCtrl,

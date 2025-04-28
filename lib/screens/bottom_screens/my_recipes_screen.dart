@@ -50,7 +50,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
                     ? const Center(child: Text('Debes iniciar sesión'))
                     : Column(
                       children: [
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
                         // Campo de búsqueda
                         TextField(
                           controller: _searchCtrl,
