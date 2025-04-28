@@ -7,6 +7,7 @@ class AuthService {
 
   Stream<User?> get userChanges => _auth.authStateChanges();
 
+  User? get currentUser => _auth.currentUser;
   String? get currentUserId => _auth.currentUser?.uid;
 
   Future<User?> signInWithGoogle() async {
