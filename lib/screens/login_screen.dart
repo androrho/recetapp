@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../controller/auth_service.dart';
 import 'main_home_screen.dart';
@@ -24,13 +25,9 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error de Firebase: ${e.message}')),
-      );
+      Fluttertoast.showToast(msg: 'Error de firebase: ${e.message}');
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al autenticar: $e')));
+      Fluttertoast.showToast(msg: 'Error al autenticar: $e');
     } finally {
       setState(() => _isLoading = false);
     }
