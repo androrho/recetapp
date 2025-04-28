@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../controller/auth_service.dart';
 import '../../controller/recipes_service.dart';
+import '../login_screen.dart';
 
 class MyAccountScreen extends StatelessWidget {
   const MyAccountScreen({Key? key}) : super(key: key);
@@ -25,9 +26,16 @@ class MyAccountScreen extends StatelessWidget {
             ],
           ),
     );
-    if (confirmed == true) {
-      await AuthService().signOut();
-    }
+    if (confirmed != true) return;
+
+    final navigator = Navigator.of(context);
+
+    await AuthService().signOut();
+
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+    );
   }
 
   Future<void> _confirmDeleteAllRecipes(BuildContext context) async {
