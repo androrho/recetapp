@@ -14,6 +14,7 @@ class CommunityScreen extends StatefulWidget {
 class _CommunityScreenState extends State<CommunityScreen> {
   final _searchCtrl = TextEditingController();
   String _searchTerm = '';
+  final RecipesService _service = RecipesService();
 
   Widget _buildRecipeList(
     BuildContext context,
@@ -165,7 +166,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 // Recipe filtered list
                 Expanded(
                   child: StreamBuilder<List<Recipe>>(
-                    stream: RecipesService().watchAll(),
+                    stream: _service.watchAll(),
                     builder: _buildRecipeList,
                   ),
                 ),
