@@ -90,7 +90,7 @@ class RecipeDetailScreen extends StatelessWidget {
                               Text(
                                 'Ingredientes',
                                 style: TextStyle(
-                                  color: theme.colorScheme.primary,
+                                  color: theme.colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -137,7 +137,7 @@ class RecipeDetailScreen extends StatelessWidget {
                               Text(
                                 'Pasos',
                                 style: TextStyle(
-                                  color: theme.colorScheme.primary,
+                                  color: theme.colorScheme.onPrimaryContainer,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
