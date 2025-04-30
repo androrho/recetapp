@@ -227,7 +227,8 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
               onPressed: () => Navigator.pop(context),
             ),
             const Expanded(child: Text('Nueva Receta')),
-            // Botón para guardar la receta
+
+            // Save recipe button
             ElevatedButton(
               onPressed: _updateFullRecipe,
               style: ElevatedButton.styleFrom(
@@ -285,6 +286,8 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
                         return null;
                       },
                     ),
+
+                    // Person number
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _numberController,
