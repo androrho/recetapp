@@ -147,7 +147,16 @@ class MyAccountScreen extends StatelessWidget {
                   // Sign out
                   ElevatedButton(
                     onPressed: () => _confirmSignOut(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 8.0,
+                      ),
+                    ),
                     child: const Text('Cerrar sesión'),
+
                   ),
                   const SizedBox(height: 16),
 
