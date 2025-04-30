@@ -67,6 +67,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+
+                // Recipe title
                 Text(
                   recipe.title ?? '',
                   style: Theme.of(context).textTheme.titleLarge,
@@ -74,6 +76,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
+
+                    // Recipe description
                     Expanded(
                       flex: 3,
                       child: Text(
@@ -82,6 +86,8 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
+
+                    // Recipe person number
                     Expanded(
                       flex: 1,
                       child: Row(
@@ -143,7 +149,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
               children: [
                 const SizedBox(height: 8),
 
-                // Campo de búsqueda
+                // Search box
                 TextField(
                   controller: _searchCtrl,
                   decoration: InputDecoration(
@@ -156,7 +162,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Listado de recetas filtrado
+                // Recipe filtered list
                 Expanded(
                   child: StreamBuilder<List<Recipe>>(
                     stream: RecipesService().watchAll(),
