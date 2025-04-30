@@ -6,6 +6,10 @@ import '../../model/recipe.dart';
 import '../add_recipe_screen.dart';
 import '../detail_my_recipes_screen.dart';
 
+/// Screen that shows the current user’s recipes in a list.
+///
+/// Users can search by title or description, tap to see details,
+/// and add a new recipe with the floating button.
 class MyRecipesScreen extends StatefulWidget {
   const MyRecipesScreen({Key? key}) : super(key: key);
 
@@ -15,7 +19,9 @@ class MyRecipesScreen extends StatefulWidget {
 
 class _MyRecipesScreenState extends State<MyRecipesScreen> {
   final _searchCtrl = TextEditingController();
+
   String _searchTerm = '';
+
   final RecipesService _service = RecipesService();
 
   @override
@@ -36,10 +42,11 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape =
+    final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final double horizontalPadding = isLandscape ? 50.0 : 45.0;
-    final String? userId = AuthService().currentUserId;
+    final horizontalPadding = isLandscape ? 50.0 : 45.0;
+
+    final userId = AuthService().currentUserId;
 
     return Scaffold(
       body: Center(
@@ -47,38 +54,41 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
           constraints: const BoxConstraints(maxWidth: 450),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-            child:
-                userId == null
-                    ? const Center(child: Text('Debes iniciar sesión'))
-                    : Column(
-                      children: [
-                        const SizedBox(height: 8),
+            child: userId == null
+            // If not logged in, show a message
+                ? const Center(child: Text('Debes iniciar sesión'))
+            // Otherwise show search and list
+                : Column(
+              children: [
+                const SizedBox(height: 8),
 
-                        // Search box
-                        TextField(
-                          controller: _searchCtrl,
-                          decoration: InputDecoration(
-                            labelText: 'Buscar recetas',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Recipe filtered list
-                        Expanded(
-                          child: StreamBuilder<List<Recipe>>(
-                            stream: _service.watchByUser(userId),
-                            builder: _buildRecipeList,
-                          ),
-                        ),
-                      ],
+                // Search box
+                TextField(
+                  controller: _searchCtrl,
+                  decoration: InputDecoration(
+                    labelText: 'Buscar recetas',
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // List of recipes, filtered by the search term
+                Expanded(
+                  child: StreamBuilder<List<Recipe>>(
+                    stream: _service.watchByUser(userId),
+                    builder: _buildRecipeList,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
+
+      // Button to add a new recipe
       floatingActionButton: FloatingActionButton(
         tooltip: 'Añadir',
         onPressed: () {
@@ -95,29 +105,29 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
     );
   }
 
+  /// Builds the list view or shows loading/error messages.
   Widget _buildRecipeList(
-    BuildContext context,
-    AsyncSnapshot<List<Recipe>> snapshot,
-  ) {
+      BuildContext context, AsyncSnapshot<List<Recipe>> snapshot) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return const Center(child: CircularProgressIndicator());
     }
     if (snapshot.hasError) {
       return Center(child: Text('Error: ${snapshot.error}'));
     }
+
+    // Apply the search filter
     final recipes = snapshot.data ?? [];
-    final filtered =
-        recipes.where((r) {
-          final title = (r.title ?? '').toLowerCase();
-          final description = (r.description ?? '').toLowerCase();
-          return title.contains(_searchTerm) ||
-              description.contains(_searchTerm);
-        }).toList();
+    final filtered = recipes.where((r) {
+      final title = (r.title ?? '').toLowerCase();
+      final desc = (r.description ?? '').toLowerCase();
+      return title.contains(_searchTerm) || desc.contains(_searchTerm);
+    }).toList();
 
     if (filtered.isEmpty) {
       return const Center(child: Text('No hay recetas que mostrar'));
     }
 
+    // Show the filtered recipes
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 16),
       itemCount: filtered.length,
@@ -125,6 +135,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
     );
   }
 
+  /// Builds one card showing a recipe’s title, description, and person icon.
   Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
     return Center(
       child: ConstrainedBox(
@@ -134,7 +145,8 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => DetailMyRecipesScreen(recipeId: recipe.id!),
+                builder: (_) =>
+                    DetailMyRecipesScreen(recipeId: recipe.id!),
               ),
             );
           },
@@ -156,7 +168,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    // Recipe description
+                    // Description
                     Expanded(
                       flex: 3,
                       child: Text(
@@ -165,8 +177,7 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    // Recipe person number
+                    // Person icon + count
                     Expanded(
                       flex: 1,
                       child: Row(
@@ -180,10 +191,9 @@ class _MyRecipesScreenState extends State<MyRecipesScreen> {
                           Icon(
                             Icons.group,
                             size: 20,
-                            color:
-                                Theme.of(
-                                  context,
-                                ).colorScheme.onSecondaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
                           ),
                         ],
                       ),

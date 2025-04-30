@@ -1,7 +1,10 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-/// Clase auxiliar para cada ingrediente.
-/// Cada elemento tendrá tres controladores: para el nombre, la cantidad y el tipo de unidad.
+/// A simple class to hold the text controllers for one ingredient row.
+/// It has three controllers:
+///  - [ingredientController] for the ingredient name,
+///  - [quantityController] for the amount,
+///  - [unitTypeController] for the unit type.
 class ListIngredientItem {
   final TextEditingController ingredientController;
   final TextEditingController quantityController;

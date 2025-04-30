@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -13,10 +12,19 @@ import '../widgets/form_items/list_ingredient_item.dart';
 import '../widgets/form_items/list_step_item.dart';
 import 'detail_my_recipes_screen.dart';
 
+/// Screen for editing an existing recipe.
+///
+/// - Loads the recipe’s current data (title, description, people count,
+///   ingredients, and steps) in initState.
+/// - Lets the user modify all fields and save changes.
+/// - Deletes the old recipe (and its ingredients/steps) before creating a new one.
+/// - After saving, shows a toast and navigates to the updated recipe’s detail.
 class EditRecipieScreen extends StatefulWidget {
+  /// The ID of the recipe to edit.
   final String recipeId;
 
-  const EditRecipieScreen({Key? key, required this.recipeId}) : super(key: key);
+  const EditRecipieScreen({Key? key, required this.recipeId})
+      : super(key: key);
 
   @override
   _EditRecipieScreenState createState() => _EditRecipieScreenState();
@@ -25,14 +33,14 @@ class EditRecipieScreen extends StatefulWidget {
 class _EditRecipieScreenState extends State<EditRecipieScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  // Controllers for the main text fields
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _numberController = TextEditingController();
 
+  // Dynamic lists for ingredients and steps
   final List<ListIngredientItem> _ingredientsList = [];
   final List<ListStepItem> _stepsList = [];
-
-  get newId => null;
 
   @override
   void initState() {
@@ -40,18 +48,20 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     _loadRecipie();
   }
 
+  /// Loads the recipe data, pre-fills text fields,
+  /// and builds the ingredient and step lists.
   Future<void> _loadRecipie() async {
-    // 1) Loads recipe
+    // Load the recipe object
     final recipe = await RecipesService()
         .watchById(widget.recipeId)
         .first;
 
-    // 2) Preload text fields
+    // Fill the title, description, and people count
     _titleController.text       = recipe.title       ?? '';
     _descriptionController.text = recipe.description ?? '';
     _numberController.text      = (recipe.personNumber ?? 0).toString();
 
-    // 3) Load recipe ingredients
+    // Load and add each ingredient row
     final ingredients = await IngredientsService()
         .watchByRecipe(widget.recipeId)
         .first;
@@ -63,7 +73,7 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
       ));
     }
 
-    // 4) Load recipe ingredients
+    // Load and add each step row
     final steps = await StepsService()
         .watchByRecipe(widget.recipeId)
         .first;
@@ -72,21 +82,25 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
         stepController: TextEditingController(text: s.text),
       ));
     }
+
+    setState(() {}); // refresh UI
   }
 
+  /// Validates the form, deletes the old recipe (ingredients and steps),
+  /// then saves a new recipe with updated data, and navigates to its detail.
   Future<void> _updateFullRecipe() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final oldRecipeId = widget.recipeId;
+    // Remove old recipe data
+    await _deleteFullRecipe(widget.recipeId);
 
-    _deleteFullRecipe(oldRecipeId);
-
+    // Save new recipe and get its ID
     final newRecipeId = await _saveFullRecipe();
 
     Fluttertoast.showToast(msg: 'Receta actualizada');
 
+    // Go back and open the new recipe detail
     Navigator.pop(context);
-
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -95,92 +109,87 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     );
   }
 
+  /// Deletes ingredients, steps, and the recipe itself.
   Future<void> _deleteFullRecipe(String recipeId) async {
-    final recipeId = widget.recipeId;
-    _deleteIngredients(recipeId);
-    _deleteSteps(recipeId);
-    _deleteRecipe(recipeId);
+    await _deleteIngredients(recipeId);
+    await _deleteSteps(recipeId);
+    await _deleteRecipe(recipeId);
   }
 
   Future<void> _deleteIngredients(String recipeId) async {
     final ingSvc = IngredientsService();
-    final ingredients = await ingSvc.watchByRecipe(recipeId).first;
-    await Future.wait(ingredients.map((i) => ingSvc.delete(i.id!)));
+    final items = await ingSvc.watchByRecipe(recipeId).first;
+    await Future.wait(items.map((i) => ingSvc.delete(i.id!)));
   }
 
   Future<void> _deleteSteps(String recipeId) async {
     final stepSvc = StepsService();
-    final steps = await stepSvc.watchByRecipe(recipeId).first;
-    await Future.wait(steps.map((s) => stepSvc.delete(s.id!)));
+    final items = await stepSvc.watchByRecipe(recipeId).first;
+    await Future.wait(items.map((s) => stepSvc.delete(s.id!)));
   }
 
   Future<void> _deleteRecipe(String recipeId) async {
-    final recipeService = RecipesService();
-    await recipeService.delete(recipeId);
+    await RecipesService().delete(recipeId);
   }
 
+  /// Saves the updated recipe, ingredients, and steps,
+  /// and returns the new recipe’s ID.
   Future<String> _saveFullRecipe() async {
-    final String recipeId = await _saveRecipe();
-    _saveIngredients(recipeId);
-    _saveSteps(recipeId);
-
+    final recipeId = await _saveRecipe();
+    await _saveIngredients(recipeId);
+    await _saveSteps(recipeId);
     return recipeId;
   }
 
   Future<String> _saveRecipe() async {
-    final String? userId = AuthService().currentUserId;
-    int personNumber = int.tryParse(_numberController.text) ?? 0;
+    final userId = AuthService().currentUserId;
+    final int people = int.tryParse(_numberController.text) ?? 0;
     final newRecipe = Recipe(
       title: _titleController.text,
       description: _descriptionController.text,
-      personNumber: personNumber,
+      personNumber: people,
       user: userId,
     );
-
     return await RecipesService().create(newRecipe);
   }
 
   Future<void> _saveIngredients(String recipeId) async {
-    for (final ingredient in _ingredientsList) {
-      final double quantity =
-          double.tryParse(ingredient.quantityController.text) ?? 0.0;
-      final ingredientObject = Ingredient(
-        name: ingredient.ingredientController.text,
-        quantity: quantity,
-        quantityType: ingredient.unitTypeController.text,
+    for (final ing in _ingredientsList) {
+      final qty = double.tryParse(ing.quantityController.text) ?? 0.0;
+      final obj = Ingredient(
+        name: ing.ingredientController.text,
+        quantity: qty,
+        quantityType: ing.unitTypeController.text,
         recipe: recipeId,
       );
-      await IngredientsService().create(ingredientObject);
+      await IngredientsService().create(obj);
     }
   }
 
   Future<void> _saveSteps(String recipeId) async {
     for (int i = 0; i < _stepsList.length; i++) {
-      final stepObject = app_step.Step(
+      final obj = app_step.Step(
         position: i + 1,
         recipe: recipeId,
         text: _stepsList[i].stepController.text,
       );
-      await StepsService().create(stepObject);
+      await StepsService().create(obj);
     }
   }
 
+  // Helpers to add/remove dynamic rows
   void _addIngredient() {
     setState(() {
-      _ingredientsList.add(
-        ListIngredientItem(
-          ingredientController: TextEditingController(),
-          quantityController: TextEditingController(),
-          unitTypeController: TextEditingController(),
-        ),
-      );
+      _ingredientsList.add(ListIngredientItem(
+        ingredientController: TextEditingController(),
+        quantityController: TextEditingController(),
+        unitTypeController: TextEditingController(),
+      ));
     });
   }
 
   void _removeIngredient(int index) {
-    setState(() {
-      _ingredientsList.removeAt(index);
-    });
+    setState(() => _ingredientsList.removeAt(index));
   }
 
   void _addStep() {
@@ -190,13 +199,12 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
   }
 
   void _removeStep(int index) {
-    setState(() {
-      _stepsList.removeAt(index);
-    });
+    setState(() => _stepsList.removeAt(index));
   }
 
   @override
   void dispose() {
+    // Dispose all controllers
     _titleController.dispose();
     _descriptionController.dispose();
     _numberController.dispose();
@@ -213,22 +221,23 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape =
+    // Padding adapts to orientation
+    final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final double horizontalPadding = isLandscape ? 50.0 : 45.0;
+    final horizontalPadding = isLandscape ? 50.0 : 45.0;
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Row(
           children: [
+            // Close icon
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
             ),
-            const Expanded(child: Text('Nueva Receta')),
-
-            // Save recipe button
+            const Expanded(child: Text('Editar Receta')),
+            // Save button
             ElevatedButton(
               onPressed: _updateFullRecipe,
               style: ElevatedButton.styleFrom(
@@ -258,51 +267,40 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Title field
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
                         labelText: 'Título',
                         border: OutlineInputBorder(),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese un título';
-                        }
-                        return null;
-                      },
+                      validator: (v) =>
+                      v == null || v.isEmpty ? 'Ingrese un título' : null,
                     ),
                     const SizedBox(height: 16),
+                    // Description field
                     TextFormField(
                       controller: _descriptionController,
+                      maxLines: 4,
                       decoration: const InputDecoration(
                         labelText: 'Descripción',
                         border: OutlineInputBorder(),
                       ),
-                      maxLines: 4,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese una descripción';
-                        }
-                        return null;
-                      },
+                      validator: (v) =>
+                      v == null || v.isEmpty ? 'Ingrese una descripción' : null,
                     ),
-
-                    // Person number
                     const SizedBox(height: 16),
+                    // People count
                     TextFormField(
                       controller: _numberController,
+                      keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         labelText: 'Número de personas',
                         border: OutlineInputBorder(),
                       ),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese un número';
-                        }
-                        if (int.tryParse(value) == null) {
-                          return 'Ingrese un número válido';
-                        }
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Ingrese un número';
+                        if (int.tryParse(v) == null) return 'Ingrese un número válido';
                         return null;
                       },
                     ),
@@ -371,7 +369,7 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  // Fila superior: Campo para el nombre del ingrediente y botón de eliminación
+                                  // Upper row
                                   Row(
                                     children: [
                                       Expanded(
@@ -399,7 +397,7 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  // Fila inferior: Dos campos para cantidad/unidades y tipo de unidades
+                                  // Lower row
                                   Row(
                                     children: [
                                       Expanded(

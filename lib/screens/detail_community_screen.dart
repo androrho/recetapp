@@ -23,7 +23,7 @@ class DetailCommunityScreen extends StatelessWidget {
       return;
     }
     try {
-      // 1) Crear nueva receta para mí
+      // Creates new recipe for the logged user
       final newRecipe = Recipe(
         title: recipe.title,
         description: recipe.description,
@@ -32,7 +32,7 @@ class DetailCommunityScreen extends StatelessWidget {
       );
       final newRecipeId = await RecipesService().create(newRecipe);
 
-      // 2) Copiar ingredientes
+      // Copy ingredients to new recipe
       final ingSvc = IngredientsService();
       final ingredients =
       await ingSvc.watchByRecipe(recipeId).first;
@@ -47,7 +47,7 @@ class DetailCommunityScreen extends StatelessWidget {
         );
       }
 
-      // 3) Copiar pasos
+      // Copy steps to new Recipe
       final stepSvc = StepsService();
       final steps = await stepSvc.watchByRecipe(recipeId).first;
       for (final s in steps) {

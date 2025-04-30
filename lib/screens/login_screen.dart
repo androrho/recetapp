@@ -5,17 +5,26 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../controller/auth_service.dart';
 import 'main_home_screen.dart';
 
+/// Screen where the user can sign in with Google.
+///
+/// Shows an icon, welcome text, and a Google sign-in button.
+/// If already loading, the button shows a spinner.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  /// Whether a sign-in request is in progress.
   bool _isLoading = false;
 
+  /// Starts Google sign-in, shows a toast on success or error,
+  /// then navigates to the main home screen.
   Future<void> _loginWithGoogle() async {
     setState(() => _isLoading = true);
+
     try {
       final user = await AuthService().signInWithGoogle();
       if (user != null) {
@@ -36,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape =
+    final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
 
@@ -49,17 +58,22 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // Profile placeholder icon
                 Icon(
                   Icons.account_circle_outlined,
                   size: 100,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
                 const SizedBox(height: 16),
+
+                // Welcome text
                 Text(
                   'Bienvenido a Recetapp',
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 32),
+
+                // Google sign-in button
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _loginWithGoogle,
                   icon: Image.asset(

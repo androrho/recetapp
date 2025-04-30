@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-/// Clase auxiliar para cada paso.
-/// Cada paso se representa con un único controlador.
+/// Holds a single text controller for one step in the recipe.
+///
+/// Each list item uses one [stepController] to read or edit the step’s text.
 class ListStepItem {
   final TextEditingController stepController;
 

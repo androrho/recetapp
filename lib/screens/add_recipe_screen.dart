@@ -11,6 +11,11 @@ import '../model/step.dart' as app_step;
 import '../widgets/form_items/list_ingredient_item.dart';
 import '../widgets/form_items/list_step_item.dart';
 
+/// Screen where the user can add a new recipe.
+///
+/// Shows a form with fields for title, description, number of people,
+/// a list of dynamic ingredients, and a list of dynamic steps.
+/// The user fills out the form and taps “Guardar” to save.
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({Key? key}) : super(key: key);
 
@@ -25,6 +30,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final _descriptionController = TextEditingController();
   final _numberController = TextEditingController();
 
+  /// Lists that hold the dynamic ingredient and step items.
   final List<ListIngredientItem> _ingredientsList = [];
   final List<ListStepItem> _stepsList = [];
 
@@ -44,56 +50,60 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     super.dispose();
   }
 
+  /// Validates the form, saves the recipe, ingredients, and steps,
+  /// then closes this screen and shows a toast.
   Future<void> _saveFullRecipe() async {
     if (!_formKey.currentState!.validate()) return;
 
     final String recipeId = await _saveRecipe();
-    _saveIngredients(recipeId);
-    _saveSteps(recipeId);
+    await _saveIngredients(recipeId);
+    await _saveSteps(recipeId);
 
     Navigator.pop(context);
-
     Fluttertoast.showToast(msg: "Receta añadida");
   }
 
+  /// Saves the main recipe data and returns its new ID.
   Future<String> _saveRecipe() async {
     final String? userId = AuthService().currentUserId;
-    int personNumber = int.tryParse(_numberController.text) ?? 0;
+    final int personNumber = int.tryParse(_numberController.text) ?? 0;
     final newRecipe = Recipe(
       title: _titleController.text,
       description: _descriptionController.text,
       personNumber: personNumber,
       user: userId,
     );
-
     return await RecipesService().create(newRecipe);
   }
 
+  /// Loops through _ingredientsList and saves each ingredient.
   Future<void> _saveIngredients(String recipeId) async {
     for (final ingredient in _ingredientsList) {
-      final double quantity =
+      final double qty =
           double.tryParse(ingredient.quantityController.text) ?? 0.0;
-      final ingredientObject = Ingredient(
+      final obj = Ingredient(
         name: ingredient.ingredientController.text,
-        quantity: quantity,
+        quantity: qty,
         quantityType: ingredient.unitTypeController.text,
         recipe: recipeId,
       );
-      await IngredientsService().create(ingredientObject);
+      await IngredientsService().create(obj);
     }
   }
 
+  /// Loops through _stepsList and saves each step.
   Future<void> _saveSteps(String recipeId) async {
     for (int i = 0; i < _stepsList.length; i++) {
-      final stepObject = app_step.Step(
+      final obj = app_step.Step(
         position: i + 1,
         recipe: recipeId,
         text: _stepsList[i].stepController.text,
       );
-      await StepsService().create(stepObject);
+      await StepsService().create(obj);
     }
   }
 
+  /// Add a new blank ingredient row.
   void _addIngredient() {
     setState(() {
       _ingredientsList.add(
@@ -106,18 +116,21 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     });
   }
 
+  /// Remove one ingredient row by index.
   void _removeIngredient(int index) {
     setState(() {
       _ingredientsList.removeAt(index);
     });
   }
 
+  /// Add a new blank step row.
   void _addStep() {
     setState(() {
       _stepsList.add(ListStepItem(stepController: TextEditingController()));
     });
   }
 
+  /// Remove one step row by index.
   void _removeStep(int index) {
     setState(() {
       _stepsList.removeAt(index);
@@ -126,22 +139,21 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape =
+    final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
-    final double horizontalPadding = isLandscape ? 50.0 : 45.0;
+    final horizontalPadding = isLandscape ? 50.0 : 45.0;
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Row(
           children: [
-            // Back button
+            // Close button
             IconButton(
               icon: const Icon(Icons.close),
               onPressed: () => Navigator.pop(context),
             ),
             const Expanded(child: Text('Nueva Receta')),
-
             // Save button
             ElevatedButton(
               onPressed: _saveFullRecipe,
@@ -172,8 +184,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-
-                    //Títle
+                    // Title field
                     TextFormField(
                       controller: _titleController,
                       decoration: const InputDecoration(
@@ -188,8 +199,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // Description
+                    // Description field
                     TextFormField(
                       controller: _descriptionController,
                       decoration: const InputDecoration(
@@ -205,8 +215,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // Person number
+                    // Number of people field
                     TextFormField(
                       controller: _numberController,
                       decoration: const InputDecoration(
@@ -225,29 +234,29 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       },
                     ),
                     const SizedBox(height: 16),
-
-                    // Steps
+                    // Steps section
                     Text("Pasos"),
                     const SizedBox(height: 8),
                     Column(
                       children: [
                         for (int i = 0; i < _stepsList.length; i++)
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 8.0),
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.secondaryContainer,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Row(
                                 children: [
                                   Expanded(
                                     child: TextFormField(
-                                      controller: _stepsList[i].stepController,
+                                      controller:
+                                      _stepsList[i].stepController,
                                       decoration: const InputDecoration(
                                         hintText: 'Paso',
                                         border: OutlineInputBorder(),
@@ -262,8 +271,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                               ),
                             ),
                           ),
-
-                        // Button add step
+                        // Add step button
                         Align(
                           alignment: Alignment.centerLeft,
                           child: ElevatedButton.icon(
@@ -275,34 +283,32 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Ingredients
+                    // Ingredients section
                     Text("Ingredientes"),
                     const SizedBox(height: 8),
                     Column(
                       children: [
                         for (int i = 0; i < _ingredientsList.length; i++)
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 8.0),
                             child: Container(
                               padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.secondaryContainer,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .secondaryContainer,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Column(
                                 children: [
-                                  // First row
+                                  // Ingredient name row
                                   Row(
                                     children: [
                                       Expanded(
                                         child: TextFormField(
-                                          controller:
-                                              _ingredientsList[i]
-                                                  .ingredientController,
+                                          controller: _ingredientsList[i]
+                                              .ingredientController,
                                           decoration: const InputDecoration(
                                             hintText: 'Ingrediente',
                                             border: OutlineInputBorder(),
@@ -318,26 +324,25 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.close),
-                                        onPressed: () => _removeIngredient(i),
+                                        onPressed: () =>
+                                            _removeIngredient(i),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-
-                                  // Bottom row
+                                  // Quantity and unit row
                                   Row(
                                     children: [
-                                      // Quantity
                                       Expanded(
                                         child: TextFormField(
-                                          controller:
-                                              _ingredientsList[i]
-                                                  .quantityController,
+                                          controller: _ingredientsList[i]
+                                              .quantityController,
                                           decoration: const InputDecoration(
                                             labelText: 'Cantidad',
                                             border: OutlineInputBorder(),
                                           ),
-                                          keyboardType: TextInputType.number,
+                                          keyboardType:
+                                          TextInputType.number,
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
@@ -352,13 +357,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-
-                                      // Quantity type
                                       Expanded(
                                         child: TextFormField(
-                                          controller:
-                                              _ingredientsList[i]
-                                                  .unitTypeController,
+                                          controller: _ingredientsList[i]
+                                              .unitTypeController,
                                           decoration: const InputDecoration(
                                             hintText: 'Tipo',
                                             border: OutlineInputBorder(),
@@ -378,8 +380,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                               ),
                             ),
                           ),
-
-                        // Button add ingredient
+                        // Add ingredient button
                         Align(
                           alignment: Alignment.centerLeft,
                           child: ElevatedButton.icon(

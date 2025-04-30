@@ -7,11 +7,16 @@ import '../model/ingredient.dart';
 import '../model/recipe.dart';
 import '../model/step.dart' as appStep;
 
+/// Screen that displays all the details of a recipe:
+/// - Title (big text)
+/// - Description (normal text)
+/// - List of ingredients (each on its own line)
+/// - List of steps (numbered)
 class RecipeDetailScreen extends StatelessWidget {
   final String recipeId;
 
   const RecipeDetailScreen({Key? key, required this.recipeId})
-    : super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,63 +40,70 @@ class RecipeDetailScreen extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapRec.hasError) {
-                  return Center(child: Text('Error receta: ${snapRec.error}'));
+                  return Center(
+                      child: Text('Error receta: ${snapRec.error}'));
                 }
                 final recipe = snapRec.data!;
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Título
+                    // Title
                     Text(
                       recipe.title ?? '',
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 12),
 
-                    // Descripción
+                    // Description
                     Text(
                       recipe.description ?? '',
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 24),
 
-                    // 2) INGREDIENTES
+                    // Ingredients header
                     Text(
                       'Ingredientes',
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     const SizedBox(height: 8),
+                    // Listen to ingredients stream
                     StreamBuilder<List<Ingredient>>(
-                      stream: IngredientsService().watchByRecipe(recipeId),
+                      stream:
+                      IngredientsService().watchByRecipe(recipeId),
                       builder: (ctxIng, snapIng) {
-                        if (snapIng.connectionState != ConnectionState.active) {
+                        if (snapIng.connectionState !=
+                            ConnectionState.active) {
                           return const SizedBox();
                         }
                         if (snapIng.hasError) {
-                          return Text('Error ingredientes: ${snapIng.error}');
+                          return Text(
+                              'Error ingredientes: ${snapIng.error}');
                         }
                         final ingredients = snapIng.data!;
 
+                        // Show each ingredient on its own line
                         return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children:
-                              ingredients.map((i) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  child: Text(
-                                    '• ${i.name} — ${i.quantity} ${i.quantityType}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                );
-                              }).toList(),
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: ingredients.map((i) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Text(
+                                '• ${i.name} — ${i.quantity} ${i.quantityType}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium,
+                              ),
+                            );
+                          }).toList(),
                         );
                       },
                     ),
                     const SizedBox(height: 24),
 
-                    // 3) PASOS
+                    // Steps header
                     Text(
                       'Pasos',
                       style: Theme.of(context).textTheme.titleSmall,
@@ -100,7 +112,8 @@ class RecipeDetailScreen extends StatelessWidget {
                     StreamBuilder<List<appStep.Step>>(
                       stream: StepsService().watchByRecipe(recipeId),
                       builder: (ctxSt, snapSt) {
-                        if (snapSt.connectionState != ConnectionState.active) {
+                        if (snapSt.connectionState !=
+                            ConnectionState.active) {
                           return const SizedBox();
                         }
                         if (snapSt.hasError) {
@@ -108,19 +121,22 @@ class RecipeDetailScreen extends StatelessWidget {
                         }
                         final steps = snapSt.data!;
 
+                        // Show each step numbered
                         return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children:
-                              steps.map((s) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 6),
-                                  child: Text(
-                                    '${s.position}. ${s.text}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
-                                  ),
-                                );
-                              }).toList(),
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: steps.map((s) {
+                            return Padding(
+                              padding:
+                              const EdgeInsets.only(bottom: 6),
+                              child: Text(
+                                '${s.position}. ${s.text}',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium,
+                              ),
+                            );
+                          }).toList(),
                         );
                       },
                     ),

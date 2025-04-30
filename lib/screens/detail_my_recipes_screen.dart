@@ -6,6 +6,10 @@ import '../controller/recipes_service.dart';
 import '../controller/steps_service.dart';
 import 'edit_recipe_screen.dart';
 
+/// Screen that shows the details of one of the user’s own recipes.
+///
+/// - Displays the recipe content via [RecipeDetailScreen].
+/// - Has a menu in the app bar to Edit or Delete the recipe.
 class DetailMyRecipesScreen extends StatelessWidget {
   final String recipeId;
 
@@ -14,7 +18,6 @@ class DetailMyRecipesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalle de Receta'),
@@ -31,19 +34,19 @@ class DetailMyRecipesScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => EditRecipieScreen(recipeId: recipeId),
+                      builder: (_) =>
+                          EditRecipieScreen(recipeId: recipeId),
                     ),
                   );
                   break;
                 case 'delete':
+                // Ask the user to confirm deletion
                   final confirm = await showDialog<bool>(
                     context: context,
-                    builder:
-                        (ctx) => AlertDialog(
+                    builder: (ctx) => AlertDialog(
                       title: const Text('¿Eliminar receta?'),
                       content: const Text(
-                        'Se eliminará la receta y todos sus datos.',
-                      ),
+                          'Se eliminará la receta y todos sus datos.'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx, false),
@@ -56,35 +59,37 @@ class DetailMyRecipesScreen extends StatelessWidget {
                       ],
                     ),
                   );
-
                   if (confirm != true) return;
 
-                  // 1) Borrar todos los ingredientes de esta receta
+                  // Delete all ingredients for this recipe
                   final ingSvc = IngredientsService();
-                  final ingredients = await ingSvc.watchByRecipe(recipeId).first;
-                  await Future.wait(ingredients.map((i) => ingSvc.delete(i.id!)));
+                  final ingredients =
+                  await ingSvc.watchByRecipe(recipeId).first;
+                  await Future.wait(
+                      ingredients.map((i) => ingSvc.delete(i.id!)));
 
-                  // 2) Borrar todos los pasos de esta receta
+                  // Delete all steps for this recipe
                   final stepSvc = StepsService();
                   final steps = await stepSvc.watchByRecipe(recipeId).first;
                   await Future.wait(steps.map((s) => stepSvc.delete(s.id!)));
 
-                  // 3) Borrar la propia receta
+                  // Delete the recipe document
                   await RecipesService().delete(recipeId);
 
-                  // 4) Volver atrás (cierra detalle)
+                  // Go back to the previous screen
                   Navigator.pop(context);
                   break;
               }
             },
-            itemBuilder:
-                (_) => const [
+            itemBuilder: (_) => const [
               PopupMenuItem(value: 'edit', child: Text('Editar')),
               PopupMenuItem(value: 'delete', child: Text('Eliminar')),
             ],
           ),
         ],
       ),
+
+      /// Displays the recipe details (title, description, ingredients, steps).
       body: RecipeDetailScreen(recipeId: recipeId),
     );
   }

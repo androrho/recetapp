@@ -4,6 +4,11 @@ import '../../controller/recipes_service.dart';
 import '../../model/recipe.dart';
 import '../detail_community_screen.dart';
 
+/// Shows all public recipes in a list, with a search box to filter them.
+///
+/// The user can type in the search box to only see recipes whose title
+/// or description contains the search term (case-insensitive).
+/// Tapping on a recipe opens its detail page.
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({Key? key}) : super(key: key);
 
@@ -12,8 +17,13 @@ class CommunityScreen extends StatefulWidget {
 }
 
 class _CommunityScreenState extends State<CommunityScreen> {
+  /// Controller for the search text field.
   final _searchCtrl = TextEditingController();
+
+  /// Current lowercase search term, updated whenever the user types.
   String _searchTerm = '';
+
+  /// Service that provides a stream of all recipes from Firestore.
   final RecipesService _service = RecipesService();
 
   @override
@@ -34,6 +44,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate padding for landscape vs portrait.
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
@@ -61,7 +72,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Recipe filtered list
+                // List of recipes, filtered by `_searchTerm`
                 Expanded(
                   child: StreamBuilder<List<Recipe>>(
                     stream: _service.watchAll(),
@@ -76,10 +87,11 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
+  /// Builds the list or shows a loading/error message.
   Widget _buildRecipeList(
-    BuildContext context,
-    AsyncSnapshot<List<Recipe>> snapshot,
-  ) {
+      BuildContext context,
+      AsyncSnapshot<List<Recipe>> snapshot,
+      ) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -87,19 +99,20 @@ class _CommunityScreenState extends State<CommunityScreen> {
       return Center(child: Text('Error: ${snapshot.error}'));
     }
 
+    // Get all recipes and apply the search filter
     final recipes = snapshot.data ?? [];
-    final filtered =
-        recipes.where((r) {
-          final title = (r.title ?? '').toLowerCase();
-          final description = (r.description ?? '').toLowerCase();
-          return title.contains(_searchTerm) ||
-              description.contains(_searchTerm);
-        }).toList();
+    final filtered = recipes.where((recipe) {
+      final title = (recipe.title ?? '').toLowerCase();
+      final desc  = (recipe.description ?? '').toLowerCase();
+      return title.contains(_searchTerm) ||
+          desc.contains(_searchTerm);
+    }).toList();
 
     if (filtered.isEmpty) {
       return const Center(child: Text('No hay recetas que mostrar'));
     }
 
+    // Build a scrollable list of recipe cards
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 16),
       itemCount: filtered.length,
@@ -107,16 +120,19 @@ class _CommunityScreenState extends State<CommunityScreen> {
     );
   }
 
+  /// Builds one recipe card showing title, description and person icon.
   Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(minWidth: 300, maxWidth: 600),
         child: GestureDetector(
           onTap: () {
+            // Open the recipe detail screen
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => DetailCommunityScreen(recipeId: recipe.id!),
+                builder: (_) =>
+                    DetailCommunityScreen(recipeId: recipe.id!),
               ),
             );
           },
@@ -147,8 +163,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    // Recipe person number
+                    // Number of people icon
                     Expanded(
                       flex: 1,
                       child: Row(
@@ -162,8 +177,9 @@ class _CommunityScreenState extends State<CommunityScreen> {
                           Icon(
                             Icons.group,
                             size: 20,
-                            color:
-                                Theme.of(context).colorScheme.onSecondaryContainer,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
                           ),
                         ],
                       ),
