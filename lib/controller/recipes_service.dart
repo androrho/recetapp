@@ -15,10 +15,7 @@ class RecipesService {
   }
 
   Stream<List<Recipe>> watchAll() {
-    return _db
-        .collection(_collection)
-        .snapshots()
-        .map((snapshot) {
+    return _db.collection(_collection).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
@@ -30,23 +27,19 @@ class RecipesService {
   Stream<List<Recipe>> watchByUser(String userId) {
     return _db
         .collection(_collection)
-        .where('user', isEqualTo: userId)       // Filtramos por campo `user`
+        .where('user', isEqualTo: userId) // Filtramos por campo `user`
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        final data = doc.data();
-        data['id'] = doc.id;
-        return Recipe.fromJson(data);
-      }).toList();
-    });
+          return snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return Recipe.fromJson(data);
+          }).toList();
+        });
   }
 
   Stream<Recipe> watchById(String id) {
-    return _db
-        .collection(_collection)
-        .doc(id)
-        .snapshots()
-        .map((docSnap) {
+    return _db.collection(_collection).doc(id).snapshots().map((docSnap) {
       if (docSnap.exists) {
         final data = docSnap.data()!;
         data['id'] = docSnap.id;
@@ -60,33 +53,6 @@ class RecipesService {
         user: '',
       );
     });
-  }
-
-  @deprecated
-  Future<List<Recipe>> read() async {
-    final snapshot = await _db.collection(_collection).get();
-    return snapshot.docs.map((doc) {
-      final data = doc.data();
-      data['id'] = doc.id;
-      return Recipe.fromJson(data);
-    }).toList();
-  }
-
-  @deprecated
-  Future<Recipe> readById(String id) async {
-    final doc = await _db.collection(_collection).doc(id).get();
-    if (doc.exists) {
-      final data = doc.data()!;
-      data['id'] = doc.id;
-      return Recipe.fromJson(data);
-    }
-    return Recipe(
-      id: "0",
-      description: "n/a",
-      personNumber: 0,
-      title: "n/a",
-      user: "0",
-    );
   }
 
   Future<void> update(String id, Recipe object) async {

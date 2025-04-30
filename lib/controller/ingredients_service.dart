@@ -17,18 +17,17 @@ class IngredientsService {
     return _db
         .collection(_collection)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-      final data = doc.data()..['id'] = doc.id;
-      return Ingredient.fromJson(data);
-    }).toList());
+        .map(
+          (snap) =>
+              snap.docs.map((doc) {
+                final data = doc.data()..['id'] = doc.id;
+                return Ingredient.fromJson(data);
+              }).toList(),
+        );
   }
 
   Stream<Ingredient> watchById(String id) {
-    return _db
-        .collection(_collection)
-        .doc(id)
-        .snapshots()
-        .map((docSnap) {
+    return _db.collection(_collection).doc(id).snapshots().map((docSnap) {
       final data = docSnap.data()!..['id'] = docSnap.id;
       return Ingredient.fromJson(data);
     });
@@ -39,37 +38,13 @@ class IngredientsService {
         .collection(_collection)
         .where('recipe', isEqualTo: recipeId)
         .snapshots()
-        .map((snap) => snap.docs.map((doc) {
-      final data = doc.data()..['id'] = doc.id;
-      return Ingredient.fromJson(data);
-    }).toList());
-  }
-
-  @deprecated
-  Future<List<Ingredient>> read() async {
-    final snapshot = await _db.collection(_collection).get();
-    return snapshot.docs.map((doc) {
-      final data = doc.data();
-      data['id'] = doc.id;
-      return Ingredient.fromJson(data);
-    }).toList();
-  }
-
-  @deprecated
-  Future<Ingredient?> readById(String id) async {
-    final doc = await _db.collection(_collection).doc(id).get();
-    if (doc.exists) {
-      final data = doc.data()!;
-      data['id'] = doc.id;
-      return Ingredient.fromJson(data);
-    }
-    return Ingredient(
-      id: "0",
-      name: "n/a",
-      quantity: 0,
-      quantityType: "n/a",
-      recipe: "0",
-    );
+        .map(
+          (snap) =>
+              snap.docs.map((doc) {
+                final data = doc.data()..['id'] = doc.id;
+                return Ingredient.fromJson(data);
+              }).toList(),
+        );
   }
 
   Future<void> update(String id, Ingredient object) async {
