@@ -65,7 +65,11 @@ class RecipeDetailScreen extends StatelessWidget {
                     // Ingredients header
                     Text(
                       'Ingredientes',
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     // Listen to ingredients stream
@@ -106,7 +110,11 @@ class RecipeDetailScreen extends StatelessWidget {
                     // Steps header
                     Text(
                       'Pasos',
-                      style: Theme.of(context).textTheme.titleSmall,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     StreamBuilder<List<appStep.Step>>(
