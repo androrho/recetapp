@@ -16,12 +16,7 @@ class Step {
     required this.text,
   });
 
-  Step copyWith({
-    String? id,
-    int? position,
-    String? recipie,
-    String? text,
-  }) {
+  Step copyWith({String? id, int? position, String? recipie, String? text}) {
     return Step(
       id: id ?? this.id,
       position: position ?? this.position,

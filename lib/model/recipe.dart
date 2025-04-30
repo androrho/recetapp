@@ -10,13 +10,7 @@ class Recipe {
   String? title;
   String? user;
 
-  Recipe({
-    this.id,
-    this.description,
-    this.personNumber,
-    this.title,
-    this.user,
-  });
+  Recipe({this.id, this.description, this.personNumber, this.title, this.user});
 
   Recipe copyWith({
     String? id,
