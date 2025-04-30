@@ -23,6 +23,7 @@ class RecipeDetailScreen extends StatelessWidget {
     final bool isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
     final double horizontalPadding = isLandscape ? 50.0 : 45.0;
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       child: Center(
@@ -40,8 +41,7 @@ class RecipeDetailScreen extends StatelessWidget {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapRec.hasError) {
-                  return Center(
-                      child: Text('Error receta: ${snapRec.error}'));
+                  return Center(child: Text('Error receta: ${snapRec.error}'));
                 }
                 final recipe = snapRec.data!;
 
@@ -51,72 +51,65 @@ class RecipeDetailScreen extends StatelessWidget {
                     // Title
                     Text(
                       recipe.title ?? '',
-                      style: Theme.of(context).textTheme.headlineMedium,
+                      style: theme.textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 12),
 
                     // Description
                     Text(
                       recipe.description ?? '',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: theme.textTheme.bodyLarge,
                     ),
                     const SizedBox(height: 24),
 
-                    // Ingredients header
-                    Text(
-                      'Ingredientes',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Listen to ingredients stream
+                    // Ingredients section
                     StreamBuilder<List<Ingredient>>(
-                      stream:
-                      IngredientsService().watchByRecipe(recipeId),
+                      stream: IngredientsService().watchByRecipe(recipeId),
                       builder: (ctxIng, snapIng) {
                         if (snapIng.connectionState !=
                             ConnectionState.active) {
                           return const SizedBox();
                         }
                         if (snapIng.hasError) {
-                          return Text(
-                              'Error ingredientes: ${snapIng.error}');
+                          return Text('Error ingredientes: ${snapIng.error}');
                         }
                         final ingredients = snapIng.data!;
-
-                        // Show each ingredient on its own line
-                        return Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: ingredients.map((i) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: Text(
-                                '• ${i.name} — ${i.quantity} ${i.quantityType}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium,
+                        if (ingredients.isEmpty) {
+                          return const SizedBox();
+                        }
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 24),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ingredientes',
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            );
-                          }).toList(),
+                              const SizedBox(height: 8),
+                              ...ingredients.map((i) => Padding(
+                                padding:
+                                const EdgeInsets.only(bottom: 6),
+                                child: Text(
+                                  '• ${i.name} — ${i.quantity} ${i.quantityType}',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              )),
+                            ],
+                          ),
                         );
                       },
                     ),
-                    const SizedBox(height: 24),
 
-                    // Steps header
-                    Text(
-                      'Pasos',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+                    // Steps section
                     StreamBuilder<List<appStep.Step>>(
                       stream: StepsService().watchByRecipe(recipeId),
                       builder: (ctxSt, snapSt) {
@@ -128,23 +121,37 @@ class RecipeDetailScreen extends StatelessWidget {
                           return Text('Error pasos: ${snapSt.error}');
                         }
                         final steps = snapSt.data!;
-
-                        // Show each step numbered
-                        return Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: steps.map((s) {
-                            return Padding(
-                              padding:
-                              const EdgeInsets.only(bottom: 6),
-                              child: Text(
-                                '${s.position}. ${s.text}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium,
+                        if (steps.isEmpty) {
+                          return const SizedBox();
+                        }
+                        return Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 24),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Pasos',
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            );
-                          }).toList(),
+                              const SizedBox(height: 8),
+                              ...steps.map((s) => Padding(
+                                padding:
+                                const EdgeInsets.only(bottom: 6),
+                                child: Text(
+                                  '${s.position}. ${s.text}',
+                                  style: theme.textTheme.bodyMedium,
+                                ),
+                              )),
+                            ],
+                          ),
                         );
                       },
                     ),
