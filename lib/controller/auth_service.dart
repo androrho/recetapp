@@ -7,15 +7,12 @@ class AuthService {
   /// FirebaseAuth singleton
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  /// The GoogleSignIn instance.
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Stream<User?> get userChanges => _auth.authStateChanges();
 
-  /// The currently signed-in [User], or `null` if no user is signed in.
   User? get currentUser => _auth.currentUser;
 
-  /// The UID of the currently signed-in user, or `null` if no user is signed in.
   String? get currentUserId => _auth.currentUser?.uid;
 
   /// Launches the Google Sign-In window, and signs the user into Firebase.
