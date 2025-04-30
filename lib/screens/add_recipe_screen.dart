@@ -25,9 +25,8 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
   final _descriptionController = TextEditingController();
   final _numberController = TextEditingController();
 
-  final List<ListStepItem> _stepsList = [];
-
   final List<ListIngredientItem> _ingredientsList = [];
+  final List<ListStepItem> _stepsList = [];
 
   @override
   void dispose() {
@@ -173,6 +172,7 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+
                     //Títle
                     TextFormField(
                       controller: _titleController,

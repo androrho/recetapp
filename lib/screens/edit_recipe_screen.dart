@@ -41,17 +41,17 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
   }
 
   Future<void> _loadRecipie() async {
-    // 1) Carga la receta desde el stream (solo el primer valor)
+    // 1) Loads recipe
     final recipe = await RecipesService()
         .watchById(widget.recipeId)
         .first;
 
-    // 2) Precarga campos de texto
+    // 2) Preload text fields
     _titleController.text       = recipe.title       ?? '';
     _descriptionController.text = recipe.description ?? '';
     _numberController.text      = (recipe.personNumber ?? 0).toString();
 
-    // 3) Carga solo los ingredientes de esta receta
+    // 3) Load recipe ingredients
     final ingredients = await IngredientsService()
         .watchByRecipe(widget.recipeId)
         .first;
@@ -63,7 +63,7 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
       ));
     }
 
-    // 4) Carga solo los pasos de esta receta
+    // 4) Load recipe ingredients
     final steps = await StepsService()
         .watchByRecipe(widget.recipeId)
         .first;
@@ -104,17 +104,13 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
   Future<void> _deleteIngredients(String recipeId) async {
     final ingSvc = IngredientsService();
-    // Obtenemos solo los ingredientes de esta receta
     final ingredients = await ingSvc.watchByRecipe(recipeId).first;
-    // Borramos todos en paralelo
     await Future.wait(ingredients.map((i) => ingSvc.delete(i.id!)));
   }
 
   Future<void> _deleteSteps(String recipeId) async {
     final stepSvc = StepsService();
-    // Obtenemos solo los pasos de esta receta
     final steps = await stepSvc.watchByRecipe(recipeId).first;
-    // Borramos todos en paralelo
     await Future.wait(steps.map((s) => stepSvc.delete(s.id!)));
   }
 
@@ -127,7 +123,6 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
     final String recipeId = await _saveRecipe();
     _saveIngredients(recipeId);
     _saveSteps(recipeId);
-    await FirebaseFirestore.instance.waitForPendingWrites(); //TODO importante
 
     return recipeId;
   }
