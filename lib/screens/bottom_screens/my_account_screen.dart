@@ -16,11 +16,11 @@ class MyAccountScreen extends StatelessWidget {
             content: const Text('¿Estás seguro que quieres cerrar sesión?'),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
+                onPressed: () => Navigator.pop(context, false),
                 child: const Text('Cancelar'),
               ),
               TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
+                onPressed: () => Navigator.pop(context, true),
                 child: const Text('Cerrar sesión'),
               ),
             ],
@@ -34,7 +34,7 @@ class MyAccountScreen extends StatelessWidget {
 
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const LoginScreen()),
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -85,13 +85,16 @@ class MyAccountScreen extends StatelessWidget {
     final userId = AuthService().currentUserId;
     if (userId == null) return;
 
-    // Borrar todas las recetas del usuario
-    final recipes = await RecipesService().watchByUser(userId).first;
-    await Future.wait(recipes.map((r) => RecipesService().delete(r.id!)));
+    _deleteAllUserRecipes(userId);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Todas las recetas han sido borradas')),
     );
+  }
+
+  Future<void> _deleteAllUserRecipes(String userId) async {
+    final recipes = await RecipesService().watchByUser(userId).first;
+    await Future.wait(recipes.map((r) => RecipesService().delete(r.id!)));
   }
 
   @override
@@ -118,6 +121,7 @@ class MyAccountScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Profile Photo
                   if (photoUrl != null) ...[
                     CircleAvatar(
                       radius: 48,
@@ -125,6 +129,8 @@ class MyAccountScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                   ],
+
+                  // User name
                   Text(
                     name,
                     textAlign: TextAlign.center,
@@ -138,14 +144,14 @@ class MyAccountScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
 
-                  // Cerrar sesión
+                  // Sign out
                   ElevatedButton(
                     onPressed: () => _confirmSignOut(context),
                     child: const Text('Cerrar sesión'),
                   ),
                   const SizedBox(height: 16),
 
-                  // Borrar recetas
+                  // Delete recipes
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
