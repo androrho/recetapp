@@ -16,108 +16,6 @@ class _CommunityScreenState extends State<CommunityScreen> {
   String _searchTerm = '';
   final RecipesService _service = RecipesService();
 
-  Widget _buildRecipeList(
-    BuildContext context,
-    AsyncSnapshot<List<Recipe>> snap,
-  ) {
-    if (snap.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (snap.hasError) {
-      return Center(child: Text('Error: ${snap.error}'));
-    }
-
-    final recipes = snap.data ?? [];
-    final filtered =
-        recipes.where((r) {
-          final title = (r.title ?? '').toLowerCase();
-          final desc = (r.description ?? '').toLowerCase();
-          return title.contains(_searchTerm) || desc.contains(_searchTerm);
-        }).toList();
-
-    if (filtered.isEmpty) {
-      return const Center(child: Text('No hay recetas disponibles'));
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      itemCount: filtered.length,
-      itemBuilder: (ctx, i) => _buildRecipeCard(ctx, filtered[i]),
-    );
-  }
-
-  Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minWidth: 300, maxWidth: 600),
-        child: GestureDetector(
-          onTap:
-              () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => DetailCommunityScreen(recipeId: recipe.id!),
-                ),
-              ),
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-
-                // Recipe title
-                Text(
-                  recipe.title ?? '',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-
-                    // Recipe description
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        recipe.description ?? '',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    // Recipe person number
-                    Expanded(
-                      flex: 1,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '${recipe.personNumber ?? 0}',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.group,
-                            size: 20,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -169,6 +67,108 @@ class _CommunityScreenState extends State<CommunityScreen> {
                     stream: _service.watchAll(),
                     builder: _buildRecipeList,
                   ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecipeList(
+    BuildContext context,
+    AsyncSnapshot<List<Recipe>> snapshot,
+  ) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (snapshot.hasError) {
+      return Center(child: Text('Error: ${snapshot.error}'));
+    }
+
+    final recipes = snapshot.data ?? [];
+    final filtered =
+        recipes.where((r) {
+          final title = (r.title ?? '').toLowerCase();
+          final description = (r.description ?? '').toLowerCase();
+          return title.contains(_searchTerm) ||
+              description.contains(_searchTerm);
+        }).toList();
+
+    if (filtered.isEmpty) {
+      return const Center(child: Text('No hay recetas que mostrar'));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      itemCount: filtered.length,
+      itemBuilder: (ctx, i) => _buildRecipeCard(ctx, filtered[i]),
+    );
+  }
+
+  Widget _buildRecipeCard(BuildContext context, Recipe recipe) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minWidth: 300, maxWidth: 600),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DetailCommunityScreen(recipeId: recipe.id!),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Recipe title
+                Text(
+                  recipe.title ?? '',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    // Recipe description
+                    Expanded(
+                      flex: 3,
+                      child: Text(
+                        recipe.description ?? '',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // Recipe person number
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            '${recipe.personNumber ?? 0}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.group,
+                            size: 20,
+                            color:
+                                Theme.of(context).colorScheme.onSecondaryContainer,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
