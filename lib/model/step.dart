@@ -20,7 +20,7 @@ class Step {
     return Step(
       id: id ?? this.id,
       position: position ?? this.position,
-      recipe: recipie ?? this.recipe,
+      recipe: recipie ?? recipe,
       text: text ?? this.text,
     );
   }
