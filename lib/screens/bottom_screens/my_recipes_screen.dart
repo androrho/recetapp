@@ -11,7 +11,7 @@ import '../detail_my_recipes_screen.dart';
 /// Users can search by title or description, tap to see details,
 /// and add a new recipe with the floating button.
 class MyRecipesScreen extends StatefulWidget {
-  const MyRecipesScreen({Key? key}) : super(key: key);
+  const MyRecipesScreen({super.key});
 
   @override
   State<MyRecipesScreen> createState() => _MyRecipesScreenState();
