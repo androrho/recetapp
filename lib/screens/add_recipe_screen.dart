@@ -15,7 +15,6 @@ import '../widgets/form_items/list_step_item.dart';
 ///
 /// Shows a form with fields for title, description, number of people,
 /// a list of dynamic ingredients, and a list of dynamic steps.
-/// The user fills out the form and taps “Guardar” to save.
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({Key? key}) : super(key: key);
 
