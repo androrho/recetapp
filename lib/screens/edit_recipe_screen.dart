@@ -99,7 +99,6 @@ class _EditRecipieScreenState extends State<EditRecipieScreen> {
 
     Fluttertoast.showToast(msg: 'Receta actualizada');
 
-    // Go back and open the new recipe detail
     Navigator.pop(context);
     Navigator.pushReplacement(
       context,
